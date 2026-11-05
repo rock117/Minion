@@ -87,13 +87,15 @@ pub async fn list_objects(
     bucket: String,
     prefix: Option<String>,
     delimiter: Option<String>,
-) -> Result<Vec<s3::ObjectInfo>, String> {
+    continuation_token: Option<String>,
+) -> Result<s3::ListObjectsResult, String> {
     let client = s3::build_client(&conn).map_err(to_err)?;
     s3::list_objects(
         &client,
         &bucket,
         prefix.as_deref().unwrap_or(""),
         delimiter.as_deref(),
+        continuation_token.as_deref(),
     )
     .await
     .map_err(to_err)
@@ -147,4 +149,20 @@ pub async fn get_object_content(
     s3::get_object_content(&client, &bucket, &key)
         .await
         .map_err(to_err)
+}
+
+#[tauri::command]
+pub async fn get_object_bytes(
+    conn: Connection,
+    bucket: String,
+    key: String,
+) -> Result<tauri::ipc::Response, String> {
+    let client = s3::build_client(&conn).map_err(to_err)?;
+    let (bytes, size, truncated) = s3::get_object_bytes(&client, &bucket, &key)
+        .await
+        .map_err(to_err)?;
+    if truncated {
+        return Err(format!("图片过大（{} 字节），超过预览上限 10MB，请使用下载", size));
+    }
+    Ok(tauri::ipc::Response::new(bytes))
 }

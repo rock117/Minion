@@ -7,6 +7,9 @@ use tauri::Emitter;
 /// 预览内容的最大字节数（超过则不下载，提示用户用下载）
 const PREVIEW_MAX_BYTES: i64 = 2 * 1024 * 1024;
 
+/// 图片预览的最大字节数
+const IMAGE_MAX_BYTES: i64 = 10 * 1024 * 1024;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ObjectInfo {
     pub key: String,
@@ -24,16 +27,28 @@ pub struct ObjectContent {
     pub content: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ListObjectsResult {
+    pub objects: Vec<ObjectInfo>,
+    pub next_continuation_token: Option<String>,
+    pub is_truncated: bool,
+}
+
 /// 列出指定 bucket + 前缀下的对象（模拟"目录"概念）
+/// 支持分页：传入 continuation_token 获取下一页
 pub async fn list_objects(
     client: &Client,
     bucket: &str,
     prefix: &str,
     delimiter: Option<&str>,
-) -> anyhow::Result<Vec<ObjectInfo>> {
+    continuation_token: Option<&str>,
+) -> anyhow::Result<ListObjectsResult> {
     let mut req = client.list_objects_v2().bucket(bucket).prefix(prefix);
     if let Some(d) = delimiter {
         req = req.delimiter(d);
+    }
+    if let Some(token) = continuation_token {
+        req = req.continuation_token(token);
     }
     let resp = req.send().await?;
 
@@ -68,7 +83,11 @@ pub async fn list_objects(
         });
     }
 
-    Ok(result)
+    Ok(ListObjectsResult {
+        objects: result,
+        next_continuation_token: resp.next_continuation_token().map(|s| s.to_string()),
+        is_truncated: resp.is_truncated().unwrap_or(false),
+    })
 }
 
 /// 上传本地文件到指定 bucket/key，并通过 Tauri 事件推送进度
@@ -220,4 +239,27 @@ pub async fn get_object_content(
         truncated: false,
         content,
     })
+}
+
+/// 读取对象原始字节用于图片预览（带 IMAGE_MAX_BYTES 限制）
+/// 返回 (bytes, size, truncated)
+pub async fn get_object_bytes(
+    client: &Client,
+    bucket: &str,
+    key: &str,
+) -> anyhow::Result<(Vec<u8>, i64, bool)> {
+    let head = client
+        .head_object()
+        .bucket(bucket)
+        .key(key)
+        .send()
+        .await?;
+    let size = head.content_length().unwrap_or(0);
+    if size > IMAGE_MAX_BYTES {
+        return Ok((Vec::new(), size, true));
+    }
+
+    let resp = client.get_object().bucket(bucket).key(key).send().await?;
+    let bytes = resp.body.collect().await?.into_bytes();
+    Ok((bytes.to_vec(), size, false))
 }

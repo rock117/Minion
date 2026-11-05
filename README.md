@@ -10,6 +10,8 @@
 - 对象上传 / 下载（带进度事件）
 - 删除对象
 - 文本/JSON/XML 预览（树状结构 + 原始视图切换）
+- 图片预览（上一张/下一张切换 + 键盘左右键）
+- 大目录分页加载（每页 1000 + 无限滚动 + 虚拟滚动，支持数万文件不卡顿）
 
 ## 技术栈
 
@@ -112,6 +114,30 @@ npm run build    # 仅构建前端到 dist/
 - 顶部可切换 **树状** / **原始** 视图（纯文本类无此切换）
 - 预览大小上限 **2MB**，超过会提示用下载代替
 
+### 8. 预览图片
+
+- 图片对象（`.jpg` `.jpeg` `.png` `.gif` `.webp` `.bmp` `.svg` `.ico` `.avif`）行内会显示 **看图** 按钮
+- 点击后弹出图片预览面板：
+  - 支持上一张 / 下一张切换（同目录下所有图片）
+  - 键盘 **←** **→** 切换，**ESC** 关闭
+  - 底部显示当前序号 `N / 总数`
+- 图片预览大小上限 **10MB**，超过会提示用下载代替
+- 技术实现：后端用 `tauri::ipc::Response` 返回原始字节（无 base64 膨胀），前端用 Blob URL 显示，切换时自动释放旧 URL 避免内存泄漏
+
+### 9. 大目录浏览（分页 + 虚拟滚动）
+
+当目录下文件数超过 1000 时：
+
+- **后端分页**：S3 API 单次最多返回 1000 个对象，使用 `continuation_token` 翻页
+- **无限滚动**：滚动到列表底部 200px 范围内时自动加载下一页（追加到列表末尾）
+- **虚拟滚动**：只渲染可视区域内的行（约 20 行 + 前后各 5 行缓冲），即使加载了数万个文件也不会卡顿
+- 底部状态栏显示"加载中..."、"共 N 项"等提示
+
+技术细节：
+- 行高固定 36px，通过 `scrollTop` 计算可视区间 `[startIndex, endIndex]`
+- 用绝对定位 + 总高度占位 div 实现滚动条
+- `ResizeObserver` 监听容器尺寸变化
+
 ## 配置存储位置
 
 连接配置通过 `tauri-plugin-store` 持久化，文件名 `minion-config.json`：
@@ -136,16 +162,17 @@ Minion/
 │       └── s3/
 │           ├── client.rs       # S3 client 构造
 │           ├── buckets.rs      # bucket 操作
-│           └── objects.rs      # 对象操作 + 进度事件 + 内容预览
+│           └── objects.rs      # 对象操作 + 进度事件 + 内容/图片预览
 └── src/
-    ├── api.ts                  # invoke 封装 + 类型
+    ├── api.ts                  # invoke 封装 + 类型 + 预览判断
     ├── store.ts                # zustand 状态管理
     ├── App.tsx / App.css       # 三栏布局 + 暗色主题
     └── components/
         ├── ConnectionSidebar.tsx
         ├── BucketList.tsx
         ├── FileBrowser.tsx
-        ├── PreviewPanel.tsx    # 预览面板（文本/JSON/XML）
+        ├── PreviewPanel.tsx    # 文本/JSON/XML 预览面板
+        ├── ImagePreviewPanel.tsx # 图片预览面板（上一张/下一张）
         └── tree/
             ├── JsonTree.tsx    # JSON 树状渲染
             └── XmlTree.tsx     # XML 树状渲染

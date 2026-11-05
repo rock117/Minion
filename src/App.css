@@ -156,6 +156,76 @@ body {
   color: var(--text-dim);
 }
 
+/* ---------- Virtual table ---------- */
+.vtable-header,
+.vtable-row {
+  display: grid;
+  grid-template-columns: 1fr 100px 180px 220px;
+  align-items: center;
+  padding: 0 16px;
+}
+
+.vtable-header {
+  height: 32px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
+.vtable-body {
+  flex: 1;
+  overflow-y: auto;
+  position: relative;
+}
+
+.vtable-row {
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  cursor: default;
+  box-sizing: border-box;
+}
+
+.vtable-row:hover {
+  background: var(--panel-2);
+}
+
+.vcol-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 8px;
+}
+
+.vcol-size,
+.vcol-date {
+  color: var(--text-dim);
+  font-size: 12px;
+}
+
+.vcol-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.vtable-loading,
+.vtable-empty,
+.vtable-end {
+  text-align: center;
+  padding: 16px;
+  color: var(--text-dim);
+  font-size: 12px;
+  position: sticky;
+  bottom: 0;
+  background: var(--bg);
+}
+
+.vtable-loading {
+  color: var(--accent);
+}
+
 .browser-header {
   display: flex;
   justify-content: space-between;
@@ -196,31 +266,7 @@ body {
 }
 
 .object-table {
-  width: 100%;
-  border-collapse: collapse;
-  flex: 1;
-  overflow: auto;
-}
-
-.object-table th,
-.object-table td {
-  text-align: left;
-  padding: 8px 16px;
-  border-bottom: 1px solid var(--border);
-}
-
-.object-table th {
-  background: var(--panel);
-  font-weight: 600;
-  font-size: 12px;
-  color: var(--text-dim);
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-
-.object-table tbody tr:hover {
-  background: var(--panel-2);
+  display: none;
 }
 
 .dir-row .obj-name.dir {
@@ -539,4 +585,81 @@ button.danger {
 .xml-comment {
   color: var(--text-dim);
   font-style: italic;
+}
+
+/* ---------- Image preview ---------- */
+.image-preview-mask {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.image-preview-container {
+  width: 90vw;
+  max-width: 1200px;
+  height: 90vh;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.image-preview-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: #1a1a1a;
+}
+
+.image-stage {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.nav-btn {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 28px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin: 0 12px;
+  transition: background 0.15s;
+}
+
+.nav-btn:hover:not(:disabled) {
+  background: rgba(77, 158, 255, 0.3);
+}
+
+.nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.image-preview-footer {
+  padding: 8px 16px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-dim);
+  text-align: center;
 }

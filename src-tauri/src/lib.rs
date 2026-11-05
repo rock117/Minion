@@ -28,6 +28,7 @@ pub fn run() {
             download_file,
             delete_object,
             get_object_content,
+            get_object_bytes,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -28,10 +28,14 @@ interface AppState {
   loadBuckets: () => Promise<void>;
   setActiveBucket: (name: string) => void;
 
-  // object
+  // object（分页）
   objects: ObjectInfo[];
   prefix: string;
+  nextToken: string | null;
+  isLoading: boolean;
+  hasMore: boolean;
   loadObjects: () => Promise<void>;
+  loadMoreObjects: () => Promise<void>;
   enterDir: (key: string) => Promise<void>;
   goUp: () => Promise<void>;
   setPrefix: (p: string) => void;
@@ -54,12 +58,22 @@ export const useStore = create<AppState>((set, get) => ({
   },
   removeConnection: async (id) => {
     await deleteConnection(id);
-    if (get().activeConnId === id) set({ activeConnId: null, buckets: [], objects: [] });
+    if (get().activeConnId === id)
+      set({ activeConnId: null, buckets: [], objects: [], prefix: "" });
     await get().loadConnections();
   },
   setActiveConn: (id) =>
-    set({ activeConnId: id, buckets: [], activeBucket: null, objects: [], prefix: "" }),
-  activeConn: () => get().connections.find((c) => c.id === get().activeConnId) ?? null,
+    set({
+      activeConnId: id,
+      buckets: [],
+      activeBucket: null,
+      objects: [],
+      prefix: "",
+      nextToken: null,
+      hasMore: false,
+    }),
+  activeConn: () =>
+    get().connections.find((c) => c.id === get().activeConnId) ?? null,
   test: async (c) => testConnection(c),
 
   buckets: [],
@@ -71,17 +85,65 @@ export const useStore = create<AppState>((set, get) => ({
     set({ buckets });
   },
   setActiveBucket: (name) =>
-    set({ activeBucket: name, objects: [], prefix: "" }),
+    set({
+      activeBucket: name,
+      objects: [],
+      prefix: "",
+      nextToken: null,
+      hasMore: false,
+    }),
 
   objects: [],
   prefix: "",
+  nextToken: null,
+  isLoading: false,
+  hasMore: false,
+
+  // 加载第一页（重置）
   loadObjects: async () => {
     const conn = get().activeConn();
     const bucket = get().activeBucket;
     if (!conn || !bucket) return;
-    const objs = await listObjects(conn, bucket, get().prefix, "/");
-    set({ objects: objs });
+    set({ isLoading: true, objects: [], nextToken: null, hasMore: false });
+    try {
+      const result = await listObjects(conn, bucket, get().prefix, "/");
+      set({
+        objects: result.objects,
+        nextToken: result.next_continuation_token,
+        hasMore: result.is_truncated,
+      });
+    } finally {
+      set({ isLoading: false });
+    }
   },
+
+  // 加载下一页（追加）
+  loadMoreObjects: async () => {
+    const conn = get().activeConn();
+    const bucket = get().activeBucket;
+    if (!conn || !bucket) return;
+    if (get().isLoading || !get().hasMore) return;
+    const token = get().nextToken;
+    if (!token) return;
+    set({ isLoading: true });
+    try {
+      const result = await listObjects(
+        conn,
+        bucket,
+        get().prefix,
+        "/",
+        token,
+      );
+      set({
+        objects: [...get().objects, ...result.objects],
+        nextToken: result.next_continuation_token,
+        hasMore: result.is_truncated,
+      });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
   enterDir: async (key) => {
     set({ prefix: key });
     await get().loadObjects();
