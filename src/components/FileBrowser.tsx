@@ -230,6 +230,7 @@ export function FileBrowser() {
       {/* 表头 */}
       <div className="vtable-header">
         <div className="vcol-name">{t("file.colName")}</div>
+        <div className="vcol-count">{t("file.colItems")}</div>
         <div className="vcol-size">{t("file.colSize")}</div>
         <div className="vcol-date">{t("file.colModified")}</div>
         <div className="vcol-actions">{t("file.colActions")}</div>
@@ -269,23 +270,6 @@ export function FileBrowser() {
                           <Folder size={15} />
                         </span>
                         {obj.key.replace(prefix, "")}
-                        {showCounts &&
-                          (() => {
-                            const c =
-                              countEntries[
-                                folderCountKey(activeBucket, obj.key)
-                              ];
-                            if (c === "loading")
-                              return (
-                                <span className="folder-count loading">…</span>
-                              );
-                            if (!c || c === "error") return null;
-                            return (
-                              <span className="folder-count">
-                                {c.capped ? `${c.count}+` : c.count}
-                              </span>
-                            );
-                          })()}
                       </span>
                     ) : (
                       <span className="obj-name">
@@ -301,6 +285,20 @@ export function FileBrowser() {
                         {obj.key.replace(prefix, "")}
                       </span>
                     )}
+                  </div>
+                  <div className="vcol-count">
+                    {obj.is_dir && showCounts
+                      ? (() => {
+                          const c =
+                            countEntries[
+                              folderCountKey(activeBucket, obj.key)
+                            ];
+                          if (c === "loading")
+                            return <span className="count-loading">…</span>;
+                          if (!c || c === "error") return "-";
+                          return c.capped ? `${c.count}+` : c.count;
+                        })()
+                      : "-"}
                   </div>
                   <div className="vcol-size">
                     {obj.is_dir ? "-" : formatSize(obj.size)}

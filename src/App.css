@@ -599,10 +599,21 @@ body {
 .vtable-header,
 .vtable-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 84px 148px 116px;
+  grid-template-columns: minmax(0, 1fr) 72px 84px 148px 116px;
   align-items: center;
   padding: 0 16px;
   gap: 10px;
+}
+
+/* 窄窗口隐藏“修改时间”列，避免横向滚动 */
+@media (max-width: 1040px) {
+  .vtable-header,
+  .vtable-row {
+    grid-template-columns: minmax(0, 1fr) 64px 76px 108px;
+  }
+  .vcol-date {
+    display: none;
+  }
 }
 
 .vtable-header {
@@ -675,6 +686,7 @@ body {
   color: var(--accent-hover);
 }
 
+.vcol-count,
 .vcol-size,
 .vcol-date {
   color: var(--text-2);
@@ -683,6 +695,10 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.count-loading {
+  color: var(--text-dim);
 }
 
 .vcol-actions {
@@ -1853,22 +1869,7 @@ button.danger-solid:hover:not(:disabled) {
   background: #fff;
 }
 
-/* 目录文件数徽标 */
-.folder-count {
-  font-size: 10.5px;
-  font-variant-numeric: tabular-nums;
-  color: var(--text-dim);
-  background: var(--panel-2);
-  border: 1px solid var(--border);
-  padding: 0 6px;
-  border-radius: 10px;
-  line-height: 16px;
-  flex-shrink: 0;
-}
 
-.folder-count.loading {
-  opacity: 0.6;
-}
 
 /* ============================================================
    Light theme
