@@ -12,6 +12,17 @@ import {
 } from "../api";
 import { PreviewPanel } from "./PreviewPanel";
 import { ImagePreviewPanel } from "./ImagePreviewPanel";
+import {
+  ArrowUp,
+  Download,
+  Eye,
+  File,
+  FileText,
+  Folder,
+  Image as ImageIcon,
+  Trash2,
+  Upload,
+} from "lucide-react";
 
 const ROW_HEIGHT = 36;
 const BUFFER_ROWS = 5;
@@ -167,9 +178,13 @@ export function FileBrowser() {
           })}
         </div>
         <div className="browser-actions">
-          {prefix && <button onClick={goUp}>↑ 上级</button>}
-          <button onClick={onUpload} disabled={busy}>
-            {busy ? "处理中..." : "⬆ 上传"}
+          {prefix && (
+            <button className="ghost" onClick={goUp}>
+              <ArrowUp size={14} /> 上级
+            </button>
+          )}
+          <button className="primary" onClick={onUpload} disabled={busy}>
+            <Upload size={14} /> {busy ? "处理中..." : "上传"}
           </button>
         </div>
       </div>
@@ -212,11 +227,23 @@ export function FileBrowser() {
                         className="obj-name dir"
                         onClick={() => enterDir(obj.key)}
                       >
-                        📁 {obj.key.replace(prefix, "")}
+                        <span className="obj-icon dir">
+                          <Folder size={15} />
+                        </span>
+                        {obj.key.replace(prefix, "")}
                       </span>
                     ) : (
                       <span className="obj-name">
-                        📄 {obj.key.replace(prefix, "")}
+                        <span className="obj-icon">
+                          {isImagePreviewable(obj.key) ? (
+                            <ImageIcon size={15} />
+                          ) : isTextPreviewable(obj.key) ? (
+                            <FileText size={15} />
+                          ) : (
+                            <File size={15} />
+                          )}
+                        </span>
+                        {obj.key.replace(prefix, "")}
                       </span>
                     )}
                   </div>
@@ -229,34 +256,38 @@ export function FileBrowser() {
                   <div className="vcol-actions row-actions">
                     {!obj.is_dir && isTextPreviewable(obj.key) && (
                       <button
+                        title="预览"
                         onClick={() => setPreviewKey(obj.key)}
                         disabled={busy}
                       >
-                        预览
+                        <Eye size={14} />
                       </button>
                     )}
                     {!obj.is_dir && isImagePreviewable(obj.key) && (
                       <button
+                        title="看图"
                         onClick={() => setImagePreviewKey(obj.key)}
                         disabled={busy}
                       >
-                        看图
+                        <ImageIcon size={14} />
                       </button>
                     )}
                     {!obj.is_dir && (
                       <button
+                        title="下载"
                         onClick={() => onDownload(obj)}
                         disabled={busy}
                       >
-                        下载
+                        <Download size={14} />
                       </button>
                     )}
                     <button
                       className="danger"
+                      title="删除"
                       onClick={() => onDelete(obj)}
                       disabled={busy}
                     >
-                      删除
+                      <Trash2 size={14} />
                     </button>
                   </div>
                 </div>

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useStore } from "../store";
 import { getImageMime, getObjectBytes } from "../api";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
 interface Props {
   bucket: string;
@@ -95,7 +96,9 @@ export function ImagePreviewPanel({
               {index + 1} / {imageKeys.length}
             </span>
           </div>
-          <button onClick={onClose}>✕ 关闭</button>
+          <button onClick={onClose}>
+            <X size={14} /> 关闭
+          </button>
         </div>
 
         <div className="image-preview-body">
@@ -106,7 +109,7 @@ export function ImagePreviewPanel({
               disabled={loading}
               title="上一张 (←)"
             >
-              ‹
+              <ChevronLeft size={22} />
             </button>
           )}
 
@@ -129,7 +132,7 @@ export function ImagePreviewPanel({
               disabled={loading}
               title="下一张 (→)"
             >
-              ›
+              <ChevronRight size={22} />
             </button>
           )}
         </div>

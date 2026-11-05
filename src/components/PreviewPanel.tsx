@@ -3,6 +3,7 @@ import { type ObjectContent, formatSize, getObjectContent } from "../api";
 import { useStore } from "../store";
 import { JsonTree, parseJson } from "./tree/JsonTree";
 import { XmlTree, parseXml } from "./tree/XmlTree";
+import { X } from "lucide-react";
 
 type PreviewKind = "json" | "xml" | "text";
 
@@ -104,7 +105,9 @@ export function PreviewPanel({ bucket, objKey, onClose }: Props) {
                 </button>
               </div>
             )}
-            <button onClick={onClose}>✕ 关闭</button>
+            <button onClick={onClose}>
+              <X size={14} /> 关闭
+            </button>
           </div>
         </div>
 

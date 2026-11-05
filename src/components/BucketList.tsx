@@ -1,5 +1,6 @@
 import { useStore } from "../store";
 import { createBucket, deleteBucket } from "../api";
+import { Plus, Trash2, Database } from "lucide-react";
 
 export function BucketList() {
   const {
@@ -46,7 +47,9 @@ export function BucketList() {
     <div className="bucket-panel">
       <div className="panel-header">
         <h2>Buckets</h2>
-        <button onClick={onCreate}>+ 新建</button>
+        <button className="icon-btn" onClick={onCreate} title="新建 bucket">
+          <Plus size={15} />
+        </button>
       </div>
       <ul className="bucket-list">
         {buckets.map((b) => (
@@ -55,7 +58,9 @@ export function BucketList() {
             className={b.name === activeBucket ? "active" : ""}
             onClick={() => onSelect(b.name)}
           >
-            <span className="bucket-icon">🪣</span>
+            <span className="bucket-icon">
+              <Database size={14} />
+            </span>
             <span className="bucket-name">{b.name}</span>
             <button
               className="icon-btn danger"
@@ -65,12 +70,16 @@ export function BucketList() {
                 onDelete(b.name);
               }}
             >
-              ✕
+              <Trash2 size={13} />
             </button>
           </li>
         ))}
         {buckets.length === 0 && (
-          <li className="empty-hint">选择一个连接后查看 buckets</li>
+          <li className="empty-hint">
+            {activeConn()
+              ? "暂无 bucket，点击上方 + 新建"
+              : "请先在左侧选择一个连接"}
+          </li>
         )}
       </ul>
     </div>

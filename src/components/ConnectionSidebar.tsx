@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { useStore } from "../store";
 import { type Connection, emptyConnection } from "../api";
+import {
+  PanelLeftClose,
+  PanelLeftOpen,
+  Plus,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 
 export function ConnectionSidebar() {
   const {
@@ -43,7 +50,91 @@ export function ConnectionSidebar() {
     }
   };
 
-  const activeConn = connections.find((c) => c.id === activeConnId);
+  const modal = editing && (
+    <div className="modal-mask" onClick={() => setEditing(null)}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <h3>{editing.id ? "编辑连接" : "新建连接"}</h3>
+        <label>
+          名称
+          <input
+            value={editing.name}
+            autoFocus
+            onChange={(e) => setEditing({ ...editing, name: e.target.value })}
+          />
+        </label>
+        <label>
+          Endpoint
+          <input
+            value={editing.endpoint}
+            placeholder="http://localhost:9000"
+            onChange={(e) =>
+              setEditing({ ...editing, endpoint: e.target.value })
+            }
+          />
+        </label>
+        <label>
+          Region
+          <input
+            value={editing.region}
+            onChange={(e) => setEditing({ ...editing, region: e.target.value })}
+          />
+        </label>
+        <label>
+          Access Key
+          <input
+            value={editing.access_key}
+            onChange={(e) =>
+              setEditing({ ...editing, access_key: e.target.value })
+            }
+          />
+        </label>
+        <label>
+          Secret Key
+          <input
+            type="password"
+            value={editing.secret_key}
+            onChange={(e) =>
+              setEditing({ ...editing, secret_key: e.target.value })
+            }
+          />
+        </label>
+        <div className="checkbox-row">
+          <label>
+            <input
+              type="checkbox"
+              checked={editing.use_path_style}
+              onChange={(e) =>
+                setEditing({ ...editing, use_path_style: e.target.checked })
+              }
+            />
+            Path Style
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={editing.allow_http}
+              onChange={(e) =>
+                setEditing({ ...editing, allow_http: e.target.checked })
+              }
+            />
+            允许 HTTP
+          </label>
+        </div>
+
+        {testMsg && <div className="test-msg">{testMsg}</div>}
+
+        <div className="modal-actions">
+          <button onClick={onTest} disabled={testing}>
+            {testing ? "测试中..." : "测试连接"}
+          </button>
+          <button onClick={save} className="primary">
+            保存
+          </button>
+          <button onClick={() => setEditing(null)}>取消</button>
+        </div>
+      </div>
+    </div>
+  );
 
   // ---------- 折叠态：窄活动栏 ----------
   if (collapsed) {
@@ -54,14 +145,12 @@ export function ConnectionSidebar() {
           title="展开侧边栏"
           onClick={() => setCollapsed(false)}
         >
-          <span className="collapse-icon">☰</span>
+          <span className="collapse-icon">
+            <PanelLeftOpen size={17} />
+          </span>
         </button>
-        <button
-          className="activity-btn"
-          title="新建连接"
-          onClick={startNew}
-        >
-          ＋
+        <button className="activity-btn" title="新建连接" onClick={startNew}>
+          <Plus size={18} />
         </button>
         <div className="activity-conn-list">
           {connections.map((c) => (
@@ -78,6 +167,7 @@ export function ConnectionSidebar() {
             </button>
           ))}
         </div>
+        {modal}
       </aside>
     );
   }
@@ -88,23 +178,18 @@ export function ConnectionSidebar() {
       <div className="sidebar-header">
         <h2>连接</h2>
         <div className="header-actions">
-          <button onClick={startNew} title="新建连接">+ 新建</button>
+          <button className="ghost" onClick={startNew} title="新建连接">
+            <Plus size={14} /> 新建
+          </button>
           <button
-            className="collapse-toggle"
+            className="icon-btn"
             title="折叠侧边栏"
             onClick={() => setCollapsed(true)}
           >
-            ◀
+            <PanelLeftClose size={16} />
           </button>
         </div>
       </div>
-
-      {activeConn && (
-        <div className="active-conn-bar">
-          <span className="active-conn-dot" />
-          <span className="active-conn-name">{activeConn.name}</span>
-        </div>
-      )}
 
       <ul className="conn-list">
         {connections.map((c) => (
@@ -126,7 +211,7 @@ export function ConnectionSidebar() {
                   startEdit(c);
                 }}
               >
-                ✎
+                <Pencil size={13} />
               </button>
               <button
                 className="icon-btn danger"
@@ -136,7 +221,7 @@ export function ConnectionSidebar() {
                   if (confirm(`删除连接 "${c.name}"?`)) removeConnection(c.id);
                 }}
               >
-                ✕
+                <Trash2 size={13} />
               </button>
             </div>
             <div className="conn-endpoint">{c.endpoint}</div>
@@ -147,92 +232,7 @@ export function ConnectionSidebar() {
         )}
       </ul>
 
-      {editing && (
-        <div className="modal-mask" onClick={() => setEditing(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>{editing.id ? "编辑连接" : "新建连接"}</h3>
-            <label>
-              名称
-              <input
-                value={editing.name}
-                onChange={(e) => setEditing({ ...editing, name: e.target.value })}
-              />
-            </label>
-            <label>
-              Endpoint
-              <input
-                value={editing.endpoint}
-                placeholder="http://localhost:9000"
-                onChange={(e) =>
-                  setEditing({ ...editing, endpoint: e.target.value })
-                }
-              />
-            </label>
-            <label>
-              Region
-              <input
-                value={editing.region}
-                onChange={(e) =>
-                  setEditing({ ...editing, region: e.target.value })
-                }
-              />
-            </label>
-            <label>
-              Access Key
-              <input
-                value={editing.access_key}
-                onChange={(e) =>
-                  setEditing({ ...editing, access_key: e.target.value })
-                }
-              />
-            </label>
-            <label>
-              Secret Key
-              <input
-                type="password"
-                value={editing.secret_key}
-                onChange={(e) =>
-                  setEditing({ ...editing, secret_key: e.target.value })
-                }
-              />
-            </label>
-            <div className="checkbox-row">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={editing.use_path_style}
-                  onChange={(e) =>
-                    setEditing({ ...editing, use_path_style: e.target.checked })
-                  }
-                />
-                Path Style
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={editing.allow_http}
-                  onChange={(e) =>
-                    setEditing({ ...editing, allow_http: e.target.checked })
-                  }
-                />
-                允许 HTTP
-              </label>
-            </div>
-
-            {testMsg && <div className="test-msg">{testMsg}</div>}
-
-            <div className="modal-actions">
-              <button onClick={onTest} disabled={testing}>
-                {testing ? "测试中..." : "测试连接"}
-              </button>
-              <button onClick={save} className="primary">
-                保存
-              </button>
-              <button onClick={() => setEditing(null)}>取消</button>
-            </div>
-          </div>
-        </div>
-      )}
+      {modal}
     </aside>
   );
 }

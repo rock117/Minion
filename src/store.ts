@@ -49,6 +49,7 @@ export const useStore = create<AppState>((set, get) => ({
     set({ connections: conns });
     if (!get().activeConnId && conns.length > 0) {
       set({ activeConnId: conns[0].id });
+      await get().loadBuckets();
     }
   },
   upsertConnection: async (c) => {
@@ -81,8 +82,13 @@ export const useStore = create<AppState>((set, get) => ({
   loadBuckets: async () => {
     const conn = get().activeConn();
     if (!conn) return;
-    const buckets = await listBuckets(conn);
-    set({ buckets });
+    try {
+      const buckets = await listBuckets(conn);
+      set({ buckets });
+    } catch (e) {
+      console.error("load buckets failed:", e);
+      set({ buckets: [] });
+    }
   },
   setActiveBucket: (name) =>
     set({
