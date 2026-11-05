@@ -13,6 +13,7 @@ export function ConnectionSidebar() {
     test,
   } = useStore();
 
+  const [collapsed, setCollapsed] = useState(false);
   const [editing, setEditing] = useState<Connection | null>(null);
   const [testing, setTesting] = useState(false);
   const [testMsg, setTestMsg] = useState<string | null>(null);
@@ -42,12 +43,68 @@ export function ConnectionSidebar() {
     }
   };
 
+  const activeConn = connections.find((c) => c.id === activeConnId);
+
+  // ---------- 折叠态：窄活动栏 ----------
+  if (collapsed) {
+    return (
+      <aside className="sidebar collapsed">
+        <button
+          className="collapse-btn"
+          title="展开侧边栏"
+          onClick={() => setCollapsed(false)}
+        >
+          <span className="collapse-icon">☰</span>
+        </button>
+        <button
+          className="activity-btn"
+          title="新建连接"
+          onClick={startNew}
+        >
+          ＋
+        </button>
+        <div className="activity-conn-list">
+          {connections.map((c) => (
+            <button
+              key={c.id}
+              className={`activity-conn ${c.id === activeConnId ? "active" : ""}`}
+              title={c.name}
+              onClick={async () => {
+                setActiveConn(c.id);
+                await loadBuckets();
+              }}
+            >
+              {c.name.charAt(0).toUpperCase()}
+            </button>
+          ))}
+        </div>
+      </aside>
+    );
+  }
+
+  // ---------- 展开态：完整侧边栏 ----------
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
         <h2>连接</h2>
-        <button onClick={startNew}>+ 新建</button>
+        <div className="header-actions">
+          <button onClick={startNew} title="新建连接">+ 新建</button>
+          <button
+            className="collapse-toggle"
+            title="折叠侧边栏"
+            onClick={() => setCollapsed(true)}
+          >
+            ◀
+          </button>
+        </div>
       </div>
+
+      {activeConn && (
+        <div className="active-conn-bar">
+          <span className="active-conn-dot" />
+          <span className="active-conn-name">{activeConn.name}</span>
+        </div>
+      )}
 
       <ul className="conn-list">
         {connections.map((c) => (

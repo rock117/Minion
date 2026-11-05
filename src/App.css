@@ -54,6 +54,133 @@ body {
   font-weight: 600;
 }
 
+.header-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.collapse-toggle {
+  padding: 2px 6px !important;
+  font-size: 11px !important;
+  border: none !important;
+  background: none !important;
+  color: var(--text-dim) !important;
+}
+
+.collapse-toggle:hover {
+  color: var(--accent) !important;
+}
+
+/* 当前活跃连接提示条 */
+.active-conn-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  background: rgba(77, 158, 255, 0.08);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+
+.active-conn-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4ade80;
+  flex-shrink: 0;
+}
+
+.active-conn-name {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- 折叠态侧边栏 ---------- */
+.sidebar.collapsed {
+  width: 48px;
+}
+
+.sidebar.collapsed .collapse-btn {
+  width: 100%;
+  height: 40px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar.collapsed .collapse-btn:hover {
+  color: var(--accent);
+  background: var(--panel-2);
+}
+
+.collapse-icon {
+  font-size: 16px;
+}
+
+.sidebar.collapsed .activity-btn {
+  width: 100%;
+  height: 40px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  color: var(--text);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar.collapsed .activity-btn:hover {
+  color: var(--accent);
+  background: var(--panel-2);
+}
+
+.activity-conn-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.activity-conn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.activity-conn:hover {
+  border-color: var(--accent);
+}
+
+.activity-conn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
 .conn-list {
   list-style: none;
   overflow-y: auto;
