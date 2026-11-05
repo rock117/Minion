@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { useStore } from "../store";
 import {
@@ -14,6 +14,8 @@ import { PreviewPanel } from "./PreviewPanel";
 import { ImagePreviewPanel } from "./ImagePreviewPanel";
 import { useDialogs } from "../dialogs";
 import { useT } from "../i18n";
+import { useSettings } from "../settings";
+import { useFolderCounts, folderCountKey } from "../folderCounts";
 import {
   ArrowUp,
   Download,
@@ -46,6 +48,9 @@ export function FileBrowser() {
   } = useStore();
   const { confirm, toast } = useDialogs();
   const t = useT();
+  const requestCount = useFolderCounts((s) => s.request);
+  const countEntries = useFolderCounts((s) => s.entries);
+  const showCounts = useSettings((s) => s.showFolderCounts);
 
   const [busy, setBusy] = useState(false);
   const [previewKey, setPreviewKey] = useState<string | null>(null);
@@ -81,6 +86,27 @@ export function FileBrowser() {
       loadMoreObjects();
     }
   }, [hasMore, isLoading, loadMoreObjects]);
+
+  // 可见文件夹（用于懒加载文件数）
+  const conn = activeConn();
+  const visibleFolderKeys = useMemo(() => {
+    const start = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - BUFFER_ROWS);
+    const end = Math.min(
+      objects.length,
+      Math.ceil((scrollTop + viewportHeight) / ROW_HEIGHT) + BUFFER_ROWS,
+    );
+    return objects
+      .slice(start, end)
+      .filter((o) => o.is_dir)
+      .map((o) => o.key);
+  }, [objects, scrollTop, viewportHeight]);
+  const visibleFolderKeyStr = visibleFolderKeys.join("|");
+
+  useEffect(() => {
+    if (!showCounts || !activeBucket || !conn) return;
+    for (const k of visibleFolderKeys) requestCount(conn, activeBucket, k);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visibleFolderKeyStr, showCounts, activeBucket, conn, requestCount]);
 
   if (!activeBucket) {
     return <div className="file-browser empty">{t("file.selectBucket")}</div>;
@@ -243,6 +269,23 @@ export function FileBrowser() {
                           <Folder size={15} />
                         </span>
                         {obj.key.replace(prefix, "")}
+                        {showCounts &&
+                          (() => {
+                            const c =
+                              countEntries[
+                                folderCountKey(activeBucket, obj.key)
+                              ];
+                            if (c === "loading")
+                              return (
+                                <span className="folder-count loading">…</span>
+                              );
+                            if (!c || c === "error") return null;
+                            return (
+                              <span className="folder-count">
+                                {c.capped ? `${c.count}+` : c.count}
+                              </span>
+                            );
+                          })()}
                       </span>
                     ) : (
                       <span className="obj-name">

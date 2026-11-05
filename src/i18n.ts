@@ -123,6 +123,8 @@ const zh = {
   "settings.language": "语言",
   "settings.langZh": "中文",
   "settings.langEn": "English",
+  "settings.folderCounts": "显示目录文件数",
+  "settings.folderCountsHint": "进入目录时统计子目录文件数（每个目录一次请求，上限 1000）",
 
   // 通用
   "dialog.ok": "确定",
@@ -245,6 +247,8 @@ const en: Record<MsgKey, string> = {
   "settings.language": "Language",
   "settings.langZh": "中文",
   "settings.langEn": "English",
+  "settings.folderCounts": "Show folder item counts",
+  "settings.folderCountsHint": "Count items in each subfolder on demand (one request per folder, max 1000)",
 
   "dialog.ok": "OK",
   "dialog.cancel": "Cancel",

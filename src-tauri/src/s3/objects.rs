@@ -34,6 +34,12 @@ pub struct ListObjectsResult {
     pub is_truncated: bool,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CountResult {
+    pub count: i64,
+    pub capped: bool,
+}
+
 /// 列出指定 bucket + 前缀下的对象（模拟"目录"概念）
 /// 支持分页：传入 continuation_token 获取下一页
 pub async fn list_objects(
@@ -194,6 +200,35 @@ pub async fn download_file(
     );
 
     Ok(())
+}
+
+/// 统计某前缀下的对象数量（单次请求，最多 max_keys 个；超出则 capped=true）
+/// MinIO/S3 无原生计数 API，这里用一次 list 请求换取低成本统计。
+pub async fn count_objects(
+    client: &Client,
+    bucket: &str,
+    prefix: &str,
+    max_keys: i32,
+) -> anyhow::Result<CountResult> {
+    let resp = client
+        .list_objects_v2()
+        .bucket(bucket)
+        .prefix(prefix)
+        .max_keys(max_keys)
+        .send()
+        .await?;
+
+    // 排除与 prefix 完全相同的“目录占位对象”
+    let count = resp
+        .contents()
+        .iter()
+        .filter(|o| o.key() != Some(prefix))
+        .count() as i64;
+
+    Ok(CountResult {
+        count,
+        capped: resp.is_truncated().unwrap_or(false),
+    })
 }
 
 /// 删除单个对象

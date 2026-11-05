@@ -152,6 +152,19 @@ pub async fn get_object_content(
 }
 
 #[tauri::command]
+pub async fn count_objects(
+    conn: Connection,
+    bucket: String,
+    prefix: String,
+    max_keys: Option<i32>,
+) -> Result<s3::CountResult, String> {
+    let client = s3::build_client(&conn).map_err(to_err)?;
+    s3::count_objects(&client, &bucket, &prefix, max_keys.unwrap_or(1000))
+        .await
+        .map_err(to_err)
+}
+
+#[tauri::command]
 pub async fn get_object_bytes(
     conn: Connection,
     bucket: String,

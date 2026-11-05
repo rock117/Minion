@@ -39,6 +39,11 @@ export interface ListObjectsResult {
   is_truncated: boolean;
 }
 
+export interface CountResult {
+  count: number;
+  capped: boolean;
+}
+
 // ---------- 连接管理 ----------
 export const listConnections = () => invoke<Connection[]>("list_connections");
 
@@ -99,6 +104,13 @@ export const getObjectContent = (conn: Connection, bucket: string, key: string) 
 
 export const getObjectBytes = (conn: Connection, bucket: string, key: string) =>
   invoke<ArrayBuffer>("get_object_bytes", { conn, bucket, key });
+
+export const countObjects = (
+  conn: Connection,
+  bucket: string,
+  prefix: string,
+  maxKeys = 1000,
+) => invoke<CountResult>("count_objects", { conn, bucket, prefix, maxKeys });
 
 // ---------- 工具 ----------
 export function formatSize(bytes: number): string {

@@ -5,6 +5,7 @@ export type Theme = "dark" | "light" | "system";
 
 const KEY_THEME = "minion.theme";
 const KEY_LOCALE = "minion.locale";
+const KEY_FOLDER_COUNTS = "minion.folderCounts";
 
 function loadTheme(): Theme {
   const v = localStorage.getItem(KEY_THEME);
@@ -31,16 +32,24 @@ export function applyTheme(theme: Theme) {
   document.documentElement.dataset.theme = resolveTheme(theme);
 }
 
+function loadFolderCounts(): boolean {
+  const v = localStorage.getItem(KEY_FOLDER_COUNTS);
+  return v === null ? true : v === "1";
+}
+
 interface SettingsState {
   theme: Theme;
   locale: Locale;
+  showFolderCounts: boolean;
   setTheme: (t: Theme) => void;
   setLocale: (l: Locale) => void;
+  setShowFolderCounts: (v: boolean) => void;
 }
 
 export const useSettings = create<SettingsState>((set) => ({
   theme: loadTheme(),
   locale: loadLocale(),
+  showFolderCounts: loadFolderCounts(),
   setTheme: (theme) => {
     localStorage.setItem(KEY_THEME, theme);
     applyTheme(theme);
@@ -49,6 +58,10 @@ export const useSettings = create<SettingsState>((set) => ({
   setLocale: (locale) => {
     localStorage.setItem(KEY_LOCALE, locale);
     set({ locale });
+  },
+  setShowFolderCounts: (v) => {
+    localStorage.setItem(KEY_FOLDER_COUNTS, v ? "1" : "0");
+    set({ showFolderCounts: v });
   },
 }));
 

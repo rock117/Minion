@@ -178,6 +178,7 @@
 - 数字列使用 `font-variant-numeric: tabular-nums`。
 - 行内操作图标按钮默认 `opacity: 0`，行 hover 时显示。
 - 文件夹图标 `--accent-hover`，文件图标 `--text-dim`。
+- 文件夹名称后可显示文件数徽标 `.folder-count`：按需统计、结果缓存、并发受限，单目录上限 1000，超出显示 `N+`；可在设置中关闭。
 
 ### 4.5 浮层 / 模态
 
@@ -379,6 +380,7 @@ t("file.total", { n: 42 });
 - [ ] 交互元素具备 hover / focus-visible / disabled / loading / empty / error 状态
 - [ ] 同一区域最多一个主按钮
 - [ ] 浮层支持 ESC 关闭、点击遮罩关闭
+- [ ] 性能敏感功能（列表统计、预览加载）具备缓存 / 并发限制 / 上限保护
 - [ ] 窄窗口（≥ 720px 宽）下无横向滚动、无截断错位
 - [ ] 深色主题下对比度足够，文字层级（text/text-2/text-dim）使用正确
 - [ ] 运行 `npm run build` 通过

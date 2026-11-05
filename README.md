@@ -14,6 +14,7 @@
 - 大目录分页加载（每页 1000 + 无限滚动 + 虚拟滚动，支持数万文件不卡顿）
 - 主题设置（深色 / 浅色 / 跟随系统）
 - 国际化（中文 / English，可实时切换）
+- 目录文件数显示（按需统计，可开关，单目录上限 1000）
 
 ## 技术栈
 
@@ -168,8 +169,9 @@ Minion/
 └── src/
     ├── api.ts                  # invoke 封装 + 类型 + 预览判断
     ├── store.ts                # zustand 状态管理
-    ├── settings.ts             # 主题/语言设置（持久化 + 应用）
+    ├── settings.ts             # 主题/语言/目录计数设置（持久化 + 应用）
     ├── i18n.ts                 # 国际化字典 + useT()
+    ├── folderCounts.ts         # 目录文件数统计（缓存 + 并发限制）
     ├── dialogs.tsx             # 应用内对话框（confirm / prompt / toast）
     ├── App.tsx / App.css       # 布局 + 设计系统（CSS 变量 + 深/浅主题）
     └── components/

@@ -29,6 +29,7 @@ pub fn run() {
             delete_object,
             get_object_content,
             get_object_bytes,
+            count_objects,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

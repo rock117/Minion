@@ -9,7 +9,14 @@ interface Props {
 }
 
 export function SettingsDialog({ onClose }: Props) {
-  const { theme, locale, setTheme, setLocale } = useSettings();
+  const {
+    theme,
+    locale,
+    showFolderCounts,
+    setTheme,
+    setLocale,
+    setShowFolderCounts,
+  } = useSettings();
   const t = useT();
 
   const themes: { value: Theme; label: string; icon: ReactNode }[] = [
@@ -72,6 +79,27 @@ export function SettingsDialog({ onClose }: Props) {
                 </button>
               ))}
             </div>
+          </div>
+        </div>
+
+        <div className="settings-section">
+          <div className="settings-row">
+            <div className="settings-text">
+              <div className="settings-row-label">
+                {t("settings.folderCounts")}
+              </div>
+              <div className="settings-hint">
+                {t("settings.folderCountsHint")}
+              </div>
+            </div>
+            <button
+              className={`switch ${showFolderCounts ? "on" : ""}`}
+              role="switch"
+              aria-checked={showFolderCounts}
+              onClick={() => setShowFolderCounts(!showFolderCounts)}
+            >
+              <span className="switch-thumb" />
+            </button>
           </div>
         </div>
       </div>
