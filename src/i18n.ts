@@ -50,7 +50,7 @@ const zh = {
 
   // 文件
   "file.colName": "名称",
-  "file.colItems": "项目数",
+  "file.colFiles": "文件数",
   "file.colSize": "大小",
   "file.colModified": "修改时间",
   "file.colActions": "操作",
@@ -178,7 +178,7 @@ const en: Record<MsgKey, string> = {
   "bucket.deleteFail": "Delete failed: {msg}",
 
   "file.colName": "Name",
-  "file.colItems": "Items",
+  "file.colFiles": "Files",
   "file.colSize": "Size",
   "file.colModified": "Modified",
   "file.colActions": "Actions",

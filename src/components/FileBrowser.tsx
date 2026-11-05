@@ -230,7 +230,7 @@ export function FileBrowser() {
       {/* 表头 */}
       <div className="vtable-header">
         <div className="vcol-name">{t("file.colName")}</div>
-        <div className="vcol-count">{t("file.colItems")}</div>
+        <div className="vcol-count">{t("file.colFiles")}</div>
         <div className="vcol-size">{t("file.colSize")}</div>
         <div className="vcol-date">{t("file.colModified")}</div>
         <div className="vcol-actions">{t("file.colActions")}</div>
