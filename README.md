@@ -166,17 +166,28 @@ Minion/
 └── src/
     ├── api.ts                  # invoke 封装 + 类型 + 预览判断
     ├── store.ts                # zustand 状态管理
-    ├── App.tsx / App.css       # 三栏布局 + 暗色主题
+    ├── dialogs.tsx             # 应用内对话框（confirm / prompt / toast）
+    ├── App.tsx / App.css       # 布局 + 设计系统（CSS 变量）
     └── components/
         ├── ConnectionSidebar.tsx
         ├── BucketList.tsx
         ├── FileBrowser.tsx
-        ├── PreviewPanel.tsx    # 文本/JSON/XML 预览面板
-        ├── ImagePreviewPanel.tsx # 图片预览面板（上一张/下一张）
+        ├── PreviewShell.tsx    # 统一预览外壳
+        ├── previewUtils.ts     # 预览工具（类型识别/复制等）
+        ├── PreviewPanel.tsx    # 文本/JSON/XML 预览
+        ├── ImagePreviewPanel.tsx # 图片预览（缩放/平移/旋转）
         └── tree/
             ├── JsonTree.tsx    # JSON 树状渲染
             └── XmlTree.tsx     # XML 树状渲染
 ```
+
+## 开发规范
+
+- **[`docs/UI_DESIGN.md`](docs/UI_DESIGN.md)**：UI 设计规范（设计令牌、组件规范、交互状态、反模式、变更检查清单）
+- **[`AGENTS.md`](AGENTS.md)**：项目规则（技术栈、命令、代码约定、UI 红线）
+- **[`.devin/rules/ui-design.md`](.devin/rules/ui-design.md)**：修改前端界面时自动应用的设计自检清单
+
+修改任何界面相关代码前请先阅读 `docs/UI_DESIGN.md`，并遵循其中的检查清单。
 
 ## 推荐 IDE
 
