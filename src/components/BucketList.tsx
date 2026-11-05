@@ -1,5 +1,6 @@
 import { useStore } from "../store";
 import { createBucket, deleteBucket } from "../api";
+import { useDialogs } from "../dialogs";
 import { Plus, Trash2, Database } from "lucide-react";
 
 export function BucketList() {
@@ -11,30 +12,44 @@ export function BucketList() {
     activeConn,
     loadBuckets,
   } = useStore();
+  const { confirm, prompt, toast } = useDialogs();
 
   const onCreate = async () => {
     const conn = activeConn();
     if (!conn) return;
-    const name = prompt("新 bucket 名称:");
+    const name = await prompt({
+      title: "新建 Bucket",
+      message: "输入 bucket 名称（仅小写字母、数字、连字符）",
+      placeholder: "my-bucket",
+      confirmText: "创建",
+    });
     if (!name) return;
     try {
       await createBucket(conn, name);
       await loadBuckets();
+      toast(`已创建 bucket「${name}」`, "success");
     } catch (e) {
-      alert(`创建失败: ${e}`);
+      toast(`创建失败: ${e}`, "error");
     }
   };
 
   const onDelete = async (name: string) => {
     const conn = activeConn();
     if (!conn) return;
-    if (!confirm(`删除 bucket "${name}"?`)) return;
+    const ok = await confirm({
+      title: "删除 Bucket",
+      message: `确定删除 bucket「${name}」？Bucket 必须为空才能删除。`,
+      confirmText: "删除",
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await deleteBucket(conn, name);
       if (activeBucket === name) setActiveBucket("");
       await loadBuckets();
+      toast("已删除 bucket", "success");
     } catch (e) {
-      alert(`删除失败: ${e}`);
+      toast(`删除失败: ${e}`, "error");
     }
   };
 

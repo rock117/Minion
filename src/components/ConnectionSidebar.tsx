@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useStore } from "../store";
 import { type Connection, emptyConnection } from "../api";
+import { useDialogs } from "../dialogs";
 import {
   PanelLeftClose,
   PanelLeftOpen,
@@ -19,6 +20,7 @@ export function ConnectionSidebar() {
     loadBuckets,
     test,
   } = useStore();
+  const { confirm } = useDialogs();
 
   const [collapsed, setCollapsed] = useState(false);
   const [editing, setEditing] = useState<Connection | null>(null);
@@ -216,9 +218,15 @@ export function ConnectionSidebar() {
               <button
                 className="icon-btn danger"
                 title="删除"
-                onClick={(e) => {
+                onClick={async (e) => {
                   e.stopPropagation();
-                  if (confirm(`删除连接 "${c.name}"?`)) removeConnection(c.id);
+                  const ok = await confirm({
+                    title: "删除连接",
+                    message: `确定删除连接「${c.name}」？`,
+                    confirmText: "删除",
+                    danger: true,
+                  });
+                  if (ok) removeConnection(c.id);
                 }}
               >
                 <Trash2 size={13} />

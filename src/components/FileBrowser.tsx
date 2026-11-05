@@ -12,6 +12,7 @@ import {
 } from "../api";
 import { PreviewPanel } from "./PreviewPanel";
 import { ImagePreviewPanel } from "./ImagePreviewPanel";
+import { useDialogs } from "../dialogs";
 import {
   ArrowUp,
   Download,
@@ -42,6 +43,7 @@ export function FileBrowser() {
     activeConn,
     setPrefix,
   } = useStore();
+  const { confirm, toast } = useDialogs();
 
   const [busy, setBusy] = useState(false);
   const [previewKey, setPreviewKey] = useState<string | null>(null);
@@ -94,8 +96,9 @@ export function FileBrowser() {
     try {
       await uploadFile(conn, activeBucket, key, localPath);
       await loadObjects();
+      toast(`已上传 ${filename}`, "success");
     } catch (e) {
-      alert(`上传失败: ${e}`);
+      toast(`上传失败: ${e}`, "error");
     } finally {
       setBusy(false);
     }
@@ -116,9 +119,9 @@ export function FileBrowser() {
     setBusy(true);
     try {
       await downloadFile(conn, activeBucket, obj.key, full);
-      alert(`已下载到: ${full}`);
+      toast(`已下载到 ${full}`, "success");
     } catch (e) {
-      alert(`下载失败: ${e}`);
+      toast(`下载失败: ${e}`, "error");
     } finally {
       setBusy(false);
     }
@@ -127,12 +130,19 @@ export function FileBrowser() {
   const onDelete = async (obj: ObjectInfo) => {
     const conn = activeConn();
     if (!conn) return;
-    if (!confirm(`删除 "${obj.key}"?`)) return;
+    const ok = await confirm({
+      title: "删除对象",
+      message: `确定删除「${obj.key}」？此操作不可撤销。`,
+      confirmText: "删除",
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await deleteObject(conn, activeBucket, obj.key);
       await loadObjects();
+      toast("已删除", "success");
     } catch (e) {
-      alert(`删除失败: ${e}`);
+      toast(`删除失败: ${e}`, "error");
     }
   };
 

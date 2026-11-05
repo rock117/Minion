@@ -3,6 +3,7 @@ import { useStore } from "./store";
 import { ConnectionSidebar } from "./components/ConnectionSidebar";
 import { BucketList } from "./components/BucketList";
 import { FileBrowser } from "./components/FileBrowser";
+import { DialogProvider } from "./dialogs";
 import { Boxes } from "lucide-react";
 import "./App.css";
 
@@ -17,6 +18,7 @@ function App() {
   }, [loadConnections]);
 
   return (
+    <DialogProvider>
     <div className="app">
       <header className="app-header">
         <div className="brand">
@@ -47,6 +49,7 @@ function App() {
         <FileBrowser />
       </div>
     </div>
+    </DialogProvider>
   );
 }
 

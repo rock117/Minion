@@ -1552,3 +1552,170 @@ button.danger:hover:not(:disabled) {
   opacity: 0.3;
   cursor: not-allowed;
 }
+
+/* ============================================================
+   In-app dialogs (confirm / prompt)
+   ============================================================ */
+.dlg-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  animation: fade-in 0.12s ease;
+}
+
+.dlg {
+  width: 400px;
+  max-width: 90vw;
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.02);
+  animation: modal-in 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dlg-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dlg-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dlg-icon.info {
+  color: var(--accent-hover);
+  background: var(--accent-soft);
+}
+
+.dlg-icon.danger {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.dlg-title {
+  font-size: 14.5px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.dlg-message {
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.dlg-input {
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  padding: 9px 11px;
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  font-family: var(--font-sans);
+  transition: border-color 0.13s, box-shadow 0.13s;
+}
+
+.dlg-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.dlg-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+button.danger-solid {
+  background: var(--danger);
+  border-color: transparent;
+  color: #fff;
+}
+
+button.danger-solid:hover:not(:disabled) {
+  background: #f47b7a;
+  color: #fff;
+}
+
+/* ============================================================
+   Toasts
+   ============================================================ */
+.toast-stack {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 300;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 200px;
+  max-width: 380px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--panel-2);
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  font-size: 12.5px;
+  color: var(--text);
+  animation: toast-in 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.toast-icon {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.toast.success .toast-icon {
+  color: var(--success);
+}
+
+.toast.error .toast-icon {
+  color: var(--danger);
+}
+
+.toast.info .toast-icon {
+  color: var(--accent-hover);
+}
+
+.toast-msg {
+  line-height: 1.5;
+  word-break: break-word;
+}
