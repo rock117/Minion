@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Check, Copy } from "lucide-react";
 import { copyText, type TreeCommand } from "../previewUtils";
+import { useT } from "../../i18n";
 
 // ---------- 类型与解析 ----------
 
@@ -100,10 +101,11 @@ function ValueView({ v }: { v: JsonValue }) {
 
 function CopyBtn({ value }: { value: JsonValue }) {
   const [done, setDone] = useState(false);
+  const t = useT();
   return (
     <button
       className="tree-copy"
-      title="复制值"
+      title={t("pv.copyValue")}
       onClick={async (e) => {
         e.stopPropagation();
         const text = isContainer(value)
@@ -128,6 +130,7 @@ interface Props {
 export function JsonTree({ data, command }: Props) {
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const lastSeq = useRef(0);
+  const t = useT();
 
   useEffect(() => {
     if (command.seq === lastSeq.current) return;
@@ -178,9 +181,10 @@ export function JsonTree({ data, command }: Props) {
               {v.kind === "array" ? "[" : "{"}
               {!isOpen && (
                 <span className="collapsed">
+                  {" "}
                   {v.kind === "array"
-                    ? ` ${sizeOf(v)} 项 `
-                    : ` ${sizeOf(v)} 字段 `}
+                    ? t("pv.items", { n: sizeOf(v) })
+                    : t("pv.fields", { n: sizeOf(v) })}{" "}
                 </span>
               )}
               {!isOpen && (v.kind === "array" ? "]" : "}")}

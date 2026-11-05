@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Check, Copy } from "lucide-react";
 import { copyText, type TreeCommand } from "../previewUtils";
+import { useT } from "../../i18n";
 
 // ---------- 类型与解析 ----------
 
@@ -79,10 +80,11 @@ function collectContainers(node: XmlNode, path: string, out: Set<string>) {
 
 function CopyBtn({ node }: { node: XmlNode }) {
   const [done, setDone] = useState(false);
+  const t = useT();
   return (
     <button
       className="tree-copy"
-      title="复制"
+      title={t("pv.copy")}
       onClick={async (e) => {
         e.stopPropagation();
         const text =
@@ -128,6 +130,7 @@ interface Props {
 export function XmlTree({ node, command }: Props) {
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const lastSeq = useRef(0);
+  const t = useT();
 
   useEffect(() => {
     if (command.seq === lastSeq.current) return;
@@ -191,7 +194,10 @@ export function XmlTree({ node, command }: Props) {
             {!hasChildren && ">"}
           </span>
           {hasChildren && !isOpen && (
-            <span className="collapsed"> {n.children.length} 子节点 </span>
+            <span className="collapsed">
+              {" "}
+              {t("pv.children", { n: n.children.length })}{" "}
+            </span>
           )}
           <CopyBtn node={n} />
         </div>

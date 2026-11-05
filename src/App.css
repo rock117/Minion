@@ -1719,3 +1719,192 @@ button.danger-solid:hover:not(:disabled) {
   line-height: 1.5;
   word-break: break-word;
 }
+
+/* ============================================================
+   Settings dialog
+   ============================================================ */
+.settings-dlg {
+  width: 460px;
+  gap: 18px;
+}
+
+.settings-dlg .dlg-head {
+  justify-content: space-between;
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settings-label {
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.settings-row-label {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.segmented {
+  display: inline-flex;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 2px;
+  gap: 2px;
+}
+
+.segmented button {
+  background: none;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 12px;
+  font-size: 12.5px;
+  color: var(--text-2);
+  height: 30px;
+  gap: 6px;
+}
+
+.segmented button:hover:not(:disabled) {
+  background: var(--panel-hover);
+  color: var(--text);
+}
+
+.segmented button.active,
+.segmented button.active:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.header-settings {
+  margin-left: 4px;
+}
+
+/* ============================================================
+   Light theme
+   ============================================================ */
+:root[data-theme="light"] {
+  --bg: #f6f7f9;
+  --bg-header: #ffffff;
+  --panel: #ffffff;
+  --panel-2: #f0f2f5;
+  --panel-hover: #e9ecf1;
+  --panel-active: #dfe3ea;
+
+  --border: rgba(15, 23, 42, 0.08);
+  --border-strong: rgba(15, 23, 42, 0.14);
+
+  --text: #16181d;
+  --text-2: #545b66;
+  --text-dim: #8a919c;
+
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-soft: rgba(79, 70, 229, 0.1);
+  --accent-glow: rgba(79, 70, 229, 0.28);
+
+  --danger: #dc2626;
+  --danger-soft: rgba(220, 38, 38, 0.1);
+  --success: #16a34a;
+}
+
+:root[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.16);
+  background-clip: padding-box;
+}
+:root[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 23, 42, 0.28);
+  background-clip: padding-box;
+}
+
+:root[data-theme="light"] .pv-mask,
+:root[data-theme="light"] .dlg-mask,
+:root[data-theme="light"] .modal-mask {
+  background: rgba(15, 23, 42, 0.35);
+}
+
+:root[data-theme="light"] .dlg,
+:root[data-theme="light"] .pv-shell,
+:root[data-theme="light"] .modal {
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18),
+    0 0 0 1px rgba(15, 23, 42, 0.04);
+}
+
+:root[data-theme="light"] .toast {
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.14);
+}
+
+/* 语法配色（浅色） */
+:root[data-theme="light"] .jv-string {
+  color: #0a7d32;
+}
+:root[data-theme="light"] .jv-number {
+  color: #b45309;
+}
+:root[data-theme="light"] .jv-bool {
+  color: #7c3aed;
+}
+:root[data-theme="light"] .tree-key {
+  color: #4f46e5;
+}
+:root[data-theme="light"] .xml-tag-name {
+  color: #b91c1c;
+}
+:root[data-theme="light"] .xml-attr-name {
+  color: #b45309;
+}
+:root[data-theme="light"] .xml-attr-val {
+  color: #0a7d32;
+}
+:root[data-theme="light"] .sr-value {
+  color: #0a7d32;
+}
+
+/* 类型徽章（浅色） */
+:root[data-theme="light"] .tone-json {
+  color: #a16207;
+  background: rgba(161, 98, 7, 0.12);
+}
+:root[data-theme="light"] .tone-xml {
+  color: #1d4ed8;
+  background: rgba(29, 78, 216, 0.1);
+}
+:root[data-theme="light"] .tone-text {
+  color: #4b5563;
+  background: rgba(75, 85, 99, 0.1);
+}
+:root[data-theme="light"] .tone-image {
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.1);
+}
+
+/* 图片棋盘格（浅色） */
+:root[data-theme="light"] .img-stage.checker {
+  background-color: #ffffff;
+  background-image: linear-gradient(45deg, #eceef2 25%, transparent 25%),
+    linear-gradient(-45deg, #eceef2 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #eceef2 75%),
+    linear-gradient(-45deg, transparent 75%, #eceef2 75%);
+}
+
+:root[data-theme="light"] .nav-btn {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: var(--border-strong);
+  color: var(--text);
+}

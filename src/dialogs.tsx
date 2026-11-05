@@ -12,6 +12,7 @@ import {
   Info,
   XCircle,
 } from "lucide-react";
+import { useT } from "./i18n";
 
 type ToastKind = "info" | "success" | "error";
 
@@ -68,6 +69,7 @@ export function DialogProvider({ children }: { children: ReactNode }) {
   const [promptState, setPromptState] = useState<PromptState | null>(null);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const toastSeq = useRef(0);
+  const t = useT();
 
   const confirm = useCallback(
     (opts: ConfirmOptions) =>
@@ -130,14 +132,14 @@ export function DialogProvider({ children }: { children: ReactNode }) {
             )}
             <div className="dlg-actions">
               <button onClick={() => closeConfirm(false)}>
-                {confirmState.opts.cancelText ?? "取消"}
+                {confirmState.opts.cancelText ?? t("dialog.cancel")}
               </button>
               <button
                 className={confirmState.opts.danger ? "danger-solid" : "primary"}
                 autoFocus
                 onClick={() => closeConfirm(true)}
               >
-                {confirmState.opts.confirmText ?? "确定"}
+                {confirmState.opts.confirmText ?? t("dialog.ok")}
               </button>
             </div>
           </div>
@@ -170,13 +172,13 @@ export function DialogProvider({ children }: { children: ReactNode }) {
             />
             <div className="dlg-actions">
               <button onClick={() => closePrompt(null)}>
-                {promptState.opts.cancelText ?? "取消"}
+                {promptState.opts.cancelText ?? t("dialog.cancel")}
               </button>
               <button
                 className="primary"
                 onClick={() => closePrompt(promptState.value.trim() || null)}
               >
-                {promptState.opts.confirmText ?? "确定"}
+                {promptState.opts.confirmText ?? t("dialog.ok")}
               </button>
             </div>
           </div>

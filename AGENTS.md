@@ -18,7 +18,8 @@
 
 **完整规范见 [`docs/UI_DESIGN.md`](docs/UI_DESIGN.md)。** 修改任何界面时必须遵循，核心红线：
 
-- 颜色 / 圆角 / 字体一律使用 `src/App.css` 顶部的 CSS 变量，禁止硬编码色值。
+- 颜色 / 圆角 / 字体一律使用 `src/App.css` 顶部的 CSS 变量，禁止硬编码色值；新增颜色需同时提供深色与浅色（`:root[data-theme="light"]`）两套值。
+- 所有用户可见文案必须通过 `src/i18n.ts` 的 `useT()` 获取，禁止硬编码中文/英文；新增文案同时补 `zh` 与 `en`。
 - 深色分层设计：`--bg` → `--panel` → `--panel-hover` → `--panel-active`；边框用半透明白 `--border` / `--border-strong`。
 - 主色 `--accent`（靛蓝）只用于主操作 / 选中 / 焦点，同一区域最多一个 `.primary`。
 - 图标使用 lucide-react，纯图标按钮必须带 `title`。

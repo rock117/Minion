@@ -9,6 +9,8 @@ globs: "src/**/*.{tsx,css}"
 完整标准见 `docs/UI_DESIGN.md`。修改界面代码时逐项自检：
 
 - [ ] 颜色 / 圆角 / 字体使用 `src/App.css` 的 CSS 变量，无硬编码色值
+- [ ] 新增颜色同时提供深色与浅色（`:root[data-theme="light"]`）两套值
+- [ ] 所有用户可见文案使用 `useT()`（`src/i18n.ts`），`zh`/`en` 字典均已补充
 - [ ] 深色分层：`--bg` / `--panel` / `--panel-hover` / `--panel-active`；边框用 `--border` / `--border-strong`
 - [ ] 主色 `--accent` 仅用于主操作 / 选中 / 焦点；同一区域最多一个 `.primary`
 - [ ] 图标用 lucide-react（禁止 emoji）；纯图标按钮带 `title`

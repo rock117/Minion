@@ -13,6 +13,7 @@ import {
 import { PreviewPanel } from "./PreviewPanel";
 import { ImagePreviewPanel } from "./ImagePreviewPanel";
 import { useDialogs } from "../dialogs";
+import { useT } from "../i18n";
 import {
   ArrowUp,
   Download,
@@ -44,6 +45,7 @@ export function FileBrowser() {
     setPrefix,
   } = useStore();
   const { confirm, toast } = useDialogs();
+  const t = useT();
 
   const [busy, setBusy] = useState(false);
   const [previewKey, setPreviewKey] = useState<string | null>(null);
@@ -81,7 +83,7 @@ export function FileBrowser() {
   }, [hasMore, isLoading, loadMoreObjects]);
 
   if (!activeBucket) {
-    return <div className="file-browser empty">← 请先选择一个 bucket</div>;
+    return <div className="file-browser empty">{t("file.selectBucket")}</div>;
   }
 
   const onUpload = async () => {
@@ -96,9 +98,9 @@ export function FileBrowser() {
     try {
       await uploadFile(conn, activeBucket, key, localPath);
       await loadObjects();
-      toast(`已上传 ${filename}`, "success");
+      toast(t("file.uploaded", { name: filename }), "success");
     } catch (e) {
-      toast(`上传失败: ${e}`, "error");
+      toast(t("file.uploadFail", { msg: String(e) }), "error");
     } finally {
       setBusy(false);
     }
@@ -110,7 +112,7 @@ export function FileBrowser() {
     const savePath = await open({
       directory: true,
       multiple: false,
-      title: "选择保存目录",
+      title: t("file.selectDir"),
     });
     if (!savePath || Array.isArray(savePath)) return;
     const dir = savePath as string;
@@ -119,9 +121,9 @@ export function FileBrowser() {
     setBusy(true);
     try {
       await downloadFile(conn, activeBucket, obj.key, full);
-      toast(`已下载到 ${full}`, "success");
+      toast(t("file.downloaded", { path: full }), "success");
     } catch (e) {
-      toast(`下载失败: ${e}`, "error");
+      toast(t("file.downloadFail", { msg: String(e) }), "error");
     } finally {
       setBusy(false);
     }
@@ -131,18 +133,18 @@ export function FileBrowser() {
     const conn = activeConn();
     if (!conn) return;
     const ok = await confirm({
-      title: "删除对象",
-      message: `确定删除「${obj.key}」？此操作不可撤销。`,
-      confirmText: "删除",
+      title: t("file.deleteTitle"),
+      message: t("file.deleteMsg", { key: obj.key }),
+      confirmText: t("dialog.delete"),
       danger: true,
     });
     if (!ok) return;
     try {
       await deleteObject(conn, activeBucket, obj.key);
       await loadObjects();
-      toast("已删除", "success");
+      toast(t("file.deleted"), "success");
     } catch (e) {
-      toast(`删除失败: ${e}`, "error");
+      toast(t("file.deleteFail", { msg: String(e) }), "error");
     }
   };
 
@@ -190,21 +192,21 @@ export function FileBrowser() {
         <div className="browser-actions">
           {prefix && (
             <button className="ghost" onClick={goUp}>
-              <ArrowUp size={14} /> 上级
+              <ArrowUp size={14} /> {t("file.up")}
             </button>
           )}
           <button className="primary" onClick={onUpload} disabled={busy}>
-            <Upload size={14} /> {busy ? "处理中..." : "上传"}
+            <Upload size={14} /> {busy ? t("file.busy") : t("file.upload")}
           </button>
         </div>
       </div>
 
       {/* 表头 */}
       <div className="vtable-header">
-        <div className="vcol-name">名称</div>
-        <div className="vcol-size">大小</div>
-        <div className="vcol-date">修改时间</div>
-        <div className="vcol-actions">操作</div>
+        <div className="vcol-name">{t("file.colName")}</div>
+        <div className="vcol-size">{t("file.colSize")}</div>
+        <div className="vcol-date">{t("file.colModified")}</div>
+        <div className="vcol-actions">{t("file.colActions")}</div>
       </div>
 
       {/* 虚拟滚动容器 */}
@@ -266,7 +268,7 @@ export function FileBrowser() {
                   <div className="vcol-actions row-actions">
                     {!obj.is_dir && isTextPreviewable(obj.key) && (
                       <button
-                        title="预览"
+                        title={t("file.preview")}
                         onClick={() => setPreviewKey(obj.key)}
                         disabled={busy}
                       >
@@ -275,7 +277,7 @@ export function FileBrowser() {
                     )}
                     {!obj.is_dir && isImagePreviewable(obj.key) && (
                       <button
-                        title="看图"
+                        title={t("file.viewImage")}
                         onClick={() => setImagePreviewKey(obj.key)}
                         disabled={busy}
                       >
@@ -284,7 +286,7 @@ export function FileBrowser() {
                     )}
                     {!obj.is_dir && (
                       <button
-                        title="下载"
+                        title={t("file.download")}
                         onClick={() => onDownload(obj)}
                         disabled={busy}
                       >
@@ -293,7 +295,7 @@ export function FileBrowser() {
                     )}
                     <button
                       className="danger"
-                      title="删除"
+                      title={t("file.delete")}
                       onClick={() => onDelete(obj)}
                       disabled={busy}
                     >
@@ -309,14 +311,16 @@ export function FileBrowser() {
         {/* 加载状态指示 */}
         {isLoading && (
           <div className="vtable-loading">
-            {objects.length === 0 ? "加载中..." : "加载更多..."}
+            {objects.length === 0 ? t("file.loading") : t("file.loadingMore")}
           </div>
         )}
         {!isLoading && objects.length === 0 && (
-          <div className="vtable-empty">该目录为空</div>
+          <div className="vtable-empty">{t("file.emptyDir")}</div>
         )}
         {!isLoading && !hasMore && objects.length > 0 && (
-          <div className="vtable-end">共 {objects.length} 项</div>
+          <div className="vtable-end">
+            {t("file.total", { n: objects.length })}
+          </div>
         )}
       </div>
 

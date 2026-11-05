@@ -1,6 +1,7 @@
 import { useStore } from "../store";
 import { createBucket, deleteBucket } from "../api";
 import { useDialogs } from "../dialogs";
+import { useT } from "../i18n";
 import { Plus, Trash2, Database } from "lucide-react";
 
 export function BucketList() {
@@ -13,23 +14,24 @@ export function BucketList() {
     loadBuckets,
   } = useStore();
   const { confirm, prompt, toast } = useDialogs();
+  const t = useT();
 
   const onCreate = async () => {
     const conn = activeConn();
     if (!conn) return;
     const name = await prompt({
-      title: "新建 Bucket",
-      message: "输入 bucket 名称（仅小写字母、数字、连字符）",
-      placeholder: "my-bucket",
-      confirmText: "创建",
+      title: t("bucket.createTitle"),
+      message: t("bucket.createMsg"),
+      placeholder: t("bucket.placeholder"),
+      confirmText: t("bucket.create"),
     });
     if (!name) return;
     try {
       await createBucket(conn, name);
       await loadBuckets();
-      toast(`已创建 bucket「${name}」`, "success");
+      toast(t("bucket.created", { name }), "success");
     } catch (e) {
-      toast(`创建失败: ${e}`, "error");
+      toast(t("bucket.createFail", { msg: String(e) }), "error");
     }
   };
 
@@ -37,9 +39,9 @@ export function BucketList() {
     const conn = activeConn();
     if (!conn) return;
     const ok = await confirm({
-      title: "删除 Bucket",
-      message: `确定删除 bucket「${name}」？Bucket 必须为空才能删除。`,
-      confirmText: "删除",
+      title: t("bucket.deleteTitle"),
+      message: t("bucket.deleteMsg", { name }),
+      confirmText: t("dialog.delete"),
       danger: true,
     });
     if (!ok) return;
@@ -47,9 +49,9 @@ export function BucketList() {
       await deleteBucket(conn, name);
       if (activeBucket === name) setActiveBucket("");
       await loadBuckets();
-      toast("已删除 bucket", "success");
+      toast(t("bucket.deleted"), "success");
     } catch (e) {
-      toast(`删除失败: ${e}`, "error");
+      toast(t("bucket.deleteFail", { msg: String(e) }), "error");
     }
   };
 
@@ -61,8 +63,8 @@ export function BucketList() {
   return (
     <div className="bucket-panel">
       <div className="panel-header">
-        <h2>Buckets</h2>
-        <button className="icon-btn" onClick={onCreate} title="新建 bucket">
+        <h2>{t("bucket.title")}</h2>
+        <button className="icon-btn" onClick={onCreate} title={t("bucket.new")}>
           <Plus size={15} />
         </button>
       </div>
@@ -79,7 +81,7 @@ export function BucketList() {
             <span className="bucket-name">{b.name}</span>
             <button
               className="icon-btn danger"
-              title="删除"
+              title={t("conn.delete")}
               onClick={(e) => {
                 e.stopPropagation();
                 onDelete(b.name);
@@ -91,9 +93,7 @@ export function BucketList() {
         ))}
         {buckets.length === 0 && (
           <li className="empty-hint">
-            {activeConn()
-              ? "暂无 bucket，点击上方 + 新建"
-              : "请先在左侧选择一个连接"}
+            {activeConn() ? t("bucket.empty") : t("bucket.emptyNoConn")}
           </li>
         )}
       </ul>

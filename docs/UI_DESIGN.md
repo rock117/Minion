@@ -333,11 +333,47 @@ if (ok) removeConnection(c.id);
 
 ---
 
-## 9. 变更检查清单
+## 9. 主题与国际化
+
+### 9.1 主题
+
+- 主题由 `src/settings.ts` 管理，取值 `"dark" | "light" | "system"`，持久化到 `localStorage`。
+- 通过给 `<html>` 设置 `data-theme="dark|light"` 切换，**不要在组件里判断主题**。
+- 深色为默认；浅色通过 `:root[data-theme="light"]` 覆盖全部设计令牌（见 `App.css`）。
+- 新增颜色时必须同时提供深色（`:root`）与浅色（`:root[data-theme="light"]`）两套值。
+- 语法高亮、棋盘格、类型徽章等硬编码色需在浅色主题下单独覆盖。
+
+### 9.2 国际化（i18n）
+
+- 所有面向用户的文案必须走 `src/i18n.ts` 的 `useT()`，**禁止在组件中硬编码中文或英文**。
+
+```tsx
+import { useT } from "../i18n";
+
+const t = useT();
+t("file.upload");
+t("file.total", { n: 42 });
+```
+
+- 文案 key 采用「模块.语义」扁平命名（如 `conn.deleteTitle`、`pv.copyAll`）。
+- 新增文案需同时补充 `zh` 与 `en` 两个字典；`en` 使用 `Record<MsgKey, string>` 强制校验完整性。
+- 支持 `{name}` 形式的变量插值。
+- 当前支持语言：中文（`zh`）、English（`en`）；默认跟随系统语言。
+
+### 9.3 设置入口
+
+- 顶栏右侧齿轮按钮打开 `SettingsDialog`。
+- 设置项分组：外观（主题）、语言。
+
+---
+
+## 10. 变更检查清单
 
 提交 UI 相关改动前逐项确认：
 
 - [ ] 所有颜色/圆角/字体都通过 CSS 变量，无硬编码色值
+- [ ] 新增颜色同时提供深色与浅色（`:root[data-theme="light"]`）两套值
+- [ ] 所有用户可见文案使用 `useT()`，`zh`/`en` 字典均已补充
 - [ ] 图标使用 lucide-react，无 emoji
 - [ ] 无 `window.confirm/alert/prompt`，使用 `useDialogs()`
 - [ ] 交互元素具备 hover / focus-visible / disabled / loading / empty / error 状态

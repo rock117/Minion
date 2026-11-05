@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useStore } from "../store";
 import { type Connection, emptyConnection } from "../api";
 import { useDialogs } from "../dialogs";
+import { useT } from "../i18n";
 import {
   PanelLeftClose,
   PanelLeftOpen,
@@ -21,6 +22,7 @@ export function ConnectionSidebar() {
     test,
   } = useStore();
   const { confirm } = useDialogs();
+  const t = useT();
 
   const [collapsed, setCollapsed] = useState(false);
   const [editing, setEditing] = useState<Connection | null>(null);
@@ -44,9 +46,9 @@ export function ConnectionSidebar() {
     setTestMsg(null);
     try {
       const buckets = await test(editing);
-      setTestMsg(`连接成功，共 ${buckets.length} 个 bucket`);
+      setTestMsg(t("conn.testOk", { n: buckets.length }));
     } catch (e) {
-      setTestMsg(`失败: ${e}`);
+      setTestMsg(t("conn.testFail", { msg: String(e) }));
     } finally {
       setTesting(false);
     }
@@ -55,9 +57,9 @@ export function ConnectionSidebar() {
   const modal = editing && (
     <div className="modal-mask" onClick={() => setEditing(null)}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h3>{editing.id ? "编辑连接" : "新建连接"}</h3>
+        <h3>{editing.id ? t("conn.edit") : t("conn.newConn")}</h3>
         <label>
-          名称
+          {t("conn.name")}
           <input
             value={editing.name}
             autoFocus
@@ -65,7 +67,7 @@ export function ConnectionSidebar() {
           />
         </label>
         <label>
-          Endpoint
+          {t("conn.endpoint")}
           <input
             value={editing.endpoint}
             placeholder="http://localhost:9000"
@@ -75,14 +77,14 @@ export function ConnectionSidebar() {
           />
         </label>
         <label>
-          Region
+          {t("conn.region")}
           <input
             value={editing.region}
             onChange={(e) => setEditing({ ...editing, region: e.target.value })}
           />
         </label>
         <label>
-          Access Key
+          {t("conn.accessKey")}
           <input
             value={editing.access_key}
             onChange={(e) =>
@@ -91,7 +93,7 @@ export function ConnectionSidebar() {
           />
         </label>
         <label>
-          Secret Key
+          {t("conn.secretKey")}
           <input
             type="password"
             value={editing.secret_key}
@@ -109,7 +111,7 @@ export function ConnectionSidebar() {
                 setEditing({ ...editing, use_path_style: e.target.checked })
               }
             />
-            Path Style
+            {t("conn.pathStyle")}
           </label>
           <label>
             <input
@@ -119,7 +121,7 @@ export function ConnectionSidebar() {
                 setEditing({ ...editing, allow_http: e.target.checked })
               }
             />
-            允许 HTTP
+            {t("conn.allowHttp")}
           </label>
         </div>
 
@@ -127,12 +129,12 @@ export function ConnectionSidebar() {
 
         <div className="modal-actions">
           <button onClick={onTest} disabled={testing}>
-            {testing ? "测试中..." : "测试连接"}
+            {testing ? t("conn.testing") : t("conn.test")}
           </button>
           <button onClick={save} className="primary">
-            保存
+            {t("conn.save")}
           </button>
-          <button onClick={() => setEditing(null)}>取消</button>
+          <button onClick={() => setEditing(null)}>{t("conn.cancel")}</button>
         </div>
       </div>
     </div>
@@ -144,14 +146,18 @@ export function ConnectionSidebar() {
       <aside className="sidebar collapsed">
         <button
           className="collapse-btn"
-          title="展开侧边栏"
+          title={t("conn.expand")}
           onClick={() => setCollapsed(false)}
         >
           <span className="collapse-icon">
             <PanelLeftOpen size={17} />
           </span>
         </button>
-        <button className="activity-btn" title="新建连接" onClick={startNew}>
+        <button
+          className="activity-btn"
+          title={t("conn.newConn")}
+          onClick={startNew}
+        >
           <Plus size={18} />
         </button>
         <div className="activity-conn-list">
@@ -178,14 +184,14 @@ export function ConnectionSidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
-        <h2>连接</h2>
+        <h2>{t("conn.title")}</h2>
         <div className="header-actions">
-          <button className="ghost" onClick={startNew} title="新建连接">
-            <Plus size={14} /> 新建
+          <button className="ghost" onClick={startNew} title={t("conn.newConn")}>
+            <Plus size={14} /> {t("conn.new")}
           </button>
           <button
             className="icon-btn"
-            title="折叠侧边栏"
+            title={t("conn.collapse")}
             onClick={() => setCollapsed(true)}
           >
             <PanelLeftClose size={16} />
@@ -207,7 +213,7 @@ export function ConnectionSidebar() {
               <span className="conn-name">{c.name}</span>
               <button
                 className="icon-btn"
-                title="编辑"
+                title={t("conn.edit")}
                 onClick={(e) => {
                   e.stopPropagation();
                   startEdit(c);
@@ -217,13 +223,13 @@ export function ConnectionSidebar() {
               </button>
               <button
                 className="icon-btn danger"
-                title="删除"
+                title={t("conn.delete")}
                 onClick={async (e) => {
                   e.stopPropagation();
                   const ok = await confirm({
-                    title: "删除连接",
-                    message: `确定删除连接「${c.name}」？`,
-                    confirmText: "删除",
+                    title: t("conn.deleteTitle"),
+                    message: t("conn.deleteMsg", { name: c.name }),
+                    confirmText: t("dialog.delete"),
                     danger: true,
                   });
                   if (ok) removeConnection(c.id);
@@ -236,7 +242,7 @@ export function ConnectionSidebar() {
           </li>
         ))}
         {connections.length === 0 && (
-          <li className="empty-hint">还没有连接，点击"新建"添加</li>
+          <li className="empty-hint">{t("conn.empty")}</li>
         )}
       </ul>
 

@@ -20,6 +20,7 @@ import {
   splitPath,
   type TreeCommand,
 } from "./previewUtils";
+import { useT } from "../i18n";
 import {
   Check,
   ChevronsDownUp,
@@ -100,6 +101,7 @@ const RAW_LINE_LIMIT = 4000;
 
 export function PreviewPanel({ bucket, objKey, onClose }: Props) {
   const activeConn = useStore((s) => s.activeConn());
+  const t = useT();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<ObjectContent | null>(null);
@@ -185,14 +187,14 @@ export function PreviewPanel({ bucket, objKey, onClose }: Props) {
         <div className="pv-tool-group">
           <button
             className="pv-tool-btn"
-            title="展开全部"
+            title={t("pv.expandAll")}
             onClick={() => setCmd((c) => ({ seq: c.seq + 1, action: "expand" }))}
           >
             <ChevronsUpDown size={14} />
           </button>
           <button
             className="pv-tool-btn"
-            title="折叠全部"
+            title={t("pv.collapseAll")}
             onClick={() =>
               setCmd((c) => ({ seq: c.seq + 1, action: "collapse" }))
             }
@@ -206,7 +208,7 @@ export function PreviewPanel({ bucket, objKey, onClose }: Props) {
         <div className="pv-search">
           <Search size={13} />
           <input
-            placeholder="搜索键或值…"
+            placeholder={t("pv.search")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -215,9 +217,9 @@ export function PreviewPanel({ bucket, objKey, onClose }: Props) {
 
       <div className="pv-tool-spacer" />
 
-      <button className="pv-tool-btn" title="复制全部" onClick={onCopyAll}>
+      <button className="pv-tool-btn" title={t("pv.copyAll")} onClick={onCopyAll}>
         {copied ? <Check size={14} /> : <Copy size={14} />}
-        <span>{copied ? "已复制" : "复制"}</span>
+        <span>{copied ? t("pv.copied") : t("pv.copy")}</span>
       </button>
 
       {showTreeToolbar && (
@@ -226,13 +228,13 @@ export function PreviewPanel({ bucket, objKey, onClose }: Props) {
             className={effectiveView === "tree" ? "active" : ""}
             onClick={() => setView("tree")}
           >
-            树状
+            {t("pv.tree")}
           </button>
           <button
             className={effectiveView === "raw" ? "active" : ""}
             onClick={() => setView("raw")}
           >
-            原始
+            {t("pv.raw")}
           </button>
         </div>
       )}
@@ -243,10 +245,14 @@ export function PreviewPanel({ bucket, objKey, onClose }: Props) {
     <>
       <span className="pv-chip">{formatSize(data?.size ?? 0)}</span>
       {kind !== "text" && <span className="pv-chip">{kind.toUpperCase()}</span>}
-      {lineCount > 0 && <span className="pv-chip">{lineCount} 行</span>}
+      {lineCount > 0 && (
+        <span className="pv-chip">{t("pv.lines", { n: lineCount })}</span>
+      )}
       {keyOrNodeCount !== null && (
         <span className="pv-chip">
-          {kind === "xml" ? `${keyOrNodeCount} 子节点` : `${keyOrNodeCount} 键`}
+          {kind === "xml"
+            ? t("pv.children", { n: keyOrNodeCount })
+            : t("pv.keys", { n: keyOrNodeCount })}
         </span>
       )}
     </>
@@ -255,13 +261,13 @@ export function PreviewPanel({ bucket, objKey, onClose }: Props) {
   // 内容区
   let content: ReactNode = null;
   if (loading) {
-    content = <div className="pv-state">加载中…</div>;
+    content = <div className="pv-state">{t("pv.loading")}</div>;
   } else if (error) {
     content = <div className="pv-state error">{error}</div>;
   } else if (data?.truncated) {
     content = (
       <div className="pv-state error">
-        文件过大（{formatSize(data.size)}），超过预览上限 2MB，请使用下载。
+        {t("pv.tooLarge", { size: formatSize(data.size) })}
       </div>
     );
   } else if (data && treeMode && trimmedQuery) {
@@ -269,7 +275,7 @@ export function PreviewPanel({ bucket, objKey, onClose }: Props) {
     if (kind === "json") {
       content =
         jsonMatches.length === 0 ? (
-          <div className="pv-state">没有匹配项</div>
+          <div className="pv-state">{t("pv.noMatch")}</div>
         ) : (
           <div className="search-results">
             {jsonMatches.map((m, i) => (
@@ -277,16 +283,16 @@ export function PreviewPanel({ bucket, objKey, onClose }: Props) {
                 <span className="sr-path">{m.path}</span>
                 {isContainer(m.value) ? (
                   <span className="sr-value dim">
-                    {m.value.kind === "array" ? "[" : "{"}
-                    {sizeOf(m.value)}
-                    {m.value.kind === "array" ? " 项]" : " 字段}"}
+                    {m.value.kind === "array"
+                      ? `[${t("pv.items", { n: sizeOf(m.value) })}]`
+                      : `{${t("pv.fields", { n: sizeOf(m.value) })}}`}
                   </span>
                 ) : (
                   <span className="sr-value">{jsonValueText(m.value)}</span>
                 )}
                 <button
                   className="tree-copy"
-                  title="复制"
+                  title={t("pv.copy")}
                   onClick={() =>
                     copyText(
                       isContainer(m.value)
@@ -304,7 +310,7 @@ export function PreviewPanel({ bucket, objKey, onClose }: Props) {
     } else {
       content =
         xmlMatches.length === 0 ? (
-          <div className="pv-state">没有匹配项</div>
+          <div className="pv-state">{t("pv.noMatch")}</div>
         ) : (
           <div className="search-results">
             {xmlMatches.map((m, i) => (
@@ -323,7 +329,9 @@ export function PreviewPanel({ bucket, objKey, onClose }: Props) {
           <JsonTree data={parsedJson.value} command={cmd} />
         </div>
       ) : (
-        <div className="pv-state error">JSON 解析失败: {parsedJson.error}</div>
+        <div className="pv-state error">
+          {t("pv.jsonError", { msg: parsedJson.error })}
+        </div>
       );
     } else if (kind === "xml" && parsedXml) {
       content = parsedXml.ok ? (
@@ -331,7 +339,9 @@ export function PreviewPanel({ bucket, objKey, onClose }: Props) {
           <XmlTree node={parsedXml.value} command={cmd} />
         </div>
       ) : (
-        <div className="pv-state error">XML 解析失败: {parsedXml.error}</div>
+        <div className="pv-state error">
+          {t("pv.xmlError", { msg: parsedXml.error })}
+        </div>
       );
     } else {
       content = null;
@@ -366,9 +376,11 @@ export function PreviewPanel({ bucket, objKey, onClose }: Props) {
       footer={
         <>
           <span>
-            {data ? `${formatSize(data.size)} · ${lineCount} 行` : ""}
+            {data
+              ? `${formatSize(data.size)} · ${t("pv.lines", { n: lineCount })}`
+              : ""}
           </span>
-          <span className="pv-hint">ESC 关闭 · ⌘/Ctrl+C 复制</span>
+          <span className="pv-hint">{t("pv.escClose")}</span>
         </>
       }
     >

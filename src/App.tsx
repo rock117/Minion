@@ -1,10 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useStore } from "./store";
 import { ConnectionSidebar } from "./components/ConnectionSidebar";
 import { BucketList } from "./components/BucketList";
 import { FileBrowser } from "./components/FileBrowser";
+import { SettingsDialog } from "./components/SettingsDialog";
 import { DialogProvider } from "./dialogs";
-import { Boxes } from "lucide-react";
+import { useT } from "./i18n";
+import { Boxes, Settings } from "lucide-react";
 import "./App.css";
 
 function App() {
@@ -12,6 +14,8 @@ function App() {
   const activeConn = useStore((s) =>
     s.connections.find((c) => c.id === s.activeConnId),
   );
+  const t = useT();
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     loadConnections();
@@ -19,36 +23,49 @@ function App() {
 
   return (
     <DialogProvider>
-    <div className="app">
-      <header className="app-header">
-        <div className="brand">
-          <span className="brand-logo">
-            <Boxes size={16} strokeWidth={2.2} />
-          </span>
-          <span className="brand-name">Minion</span>
-        </div>
-        <div className="header-meta">
-          {activeConn ? (
-            <>
-              <span className="status-dot online" />
-              <span className="header-conn">{activeConn.name}</span>
-              <span className="header-endpoint">{activeConn.endpoint}</span>
-            </>
-          ) : (
-            <>
-              <span className="status-dot" />
-              <span className="header-conn dim">未连接</span>
-            </>
-          )}
-        </div>
-      </header>
+      <div className="app">
+        <header className="app-header">
+          <div className="brand">
+            <span className="brand-logo">
+              <Boxes size={16} strokeWidth={2.2} />
+            </span>
+            <span className="brand-name">Minion</span>
+          </div>
+          <div className="header-meta">
+            {activeConn ? (
+              <>
+                <span className="status-dot online" />
+                <span className="header-conn">{activeConn.name}</span>
+                <span className="header-endpoint">{activeConn.endpoint}</span>
+              </>
+            ) : (
+              <>
+                <span className="status-dot" />
+                <span className="header-conn dim">
+                  {t("app.notConnected")}
+                </span>
+              </>
+            )}
+            <button
+              className="icon-btn header-settings"
+              title={t("settings.open")}
+              onClick={() => setShowSettings(true)}
+            >
+              <Settings size={16} />
+            </button>
+          </div>
+        </header>
 
-      <div className="app-body">
-        <ConnectionSidebar />
-        <BucketList />
-        <FileBrowser />
+        <div className="app-body">
+          <ConnectionSidebar />
+          <BucketList />
+          <FileBrowser />
+        </div>
       </div>
-    </div>
+
+      {showSettings && (
+        <SettingsDialog onClose={() => setShowSettings(false)} />
+      )}
     </DialogProvider>
   );
 }

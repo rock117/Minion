@@ -4,6 +4,7 @@ import { useStore } from "../store";
 import { formatSize, getImageMime, getObjectBytes } from "../api";
 import { PreviewShell } from "./PreviewShell";
 import { getFileBadge, splitPath } from "./previewUtils";
+import { useT } from "../i18n";
 import {
   ChevronLeft,
   ChevronRight,
@@ -38,6 +39,7 @@ export function ImagePreviewPanel({
   onClose,
 }: Props) {
   const activeConn = useStore((s) => s.activeConn());
+  const t = useT();
   const [index, setIndex] = useState(() =>
     Math.max(0, imageKeys.indexOf(initialKey)),
   );
@@ -229,21 +231,21 @@ export function ImagePreviewPanel({
       <div className="pv-tool-group">
         <button
           className="pv-tool-btn"
-          title="缩小 (-)"
+          title={t("img.zoomOut")}
           onClick={() => zoomBy(1 / 1.25)}
         >
           <Minus size={14} />
         </button>
         <button
           className="pv-tool-btn zoom-label"
-          title="适应窗口 (0)"
+          title={t("img.fitTip")}
           onClick={fit}
         >
           {percent}%
         </button>
         <button
           className="pv-tool-btn"
-          title="放大 (+)"
+          title={t("img.zoomIn")}
           onClick={() => zoomBy(1.25)}
         >
           <Plus size={14} />
@@ -251,16 +253,20 @@ export function ImagePreviewPanel({
       </div>
 
       <div className="pv-tool-group">
-        <button className="pv-tool-btn" title="适应窗口 (0)" onClick={fit}>
+        <button className="pv-tool-btn" title={t("img.fitTip")} onClick={fit}>
           <Maximize size={14} />
-          <span>适应</span>
-        </button>
-        <button className="pv-tool-btn" title="原始尺寸 1:1 (1)" onClick={actual}>
-          1:1
+          <span>{t("img.fit")}</span>
         </button>
         <button
           className="pv-tool-btn"
-          title="旋转 90° (R)"
+          title={t("img.actualTip")}
+          onClick={actual}
+        >
+          {t("img.actual")}
+        </button>
+        <button
+          className="pv-tool-btn"
+          title={t("img.rotate")}
           onClick={() => setRotate((r) => r + 90)}
         >
           <RotateCw size={14} />
@@ -271,10 +277,10 @@ export function ImagePreviewPanel({
 
       {imageKeys.length > 1 && (
         <div className="pv-tool-group">
-          <button className="pv-tool-btn" title="上一张 (←)" onClick={goPrev}>
+          <button className="pv-tool-btn" title={t("img.prev")} onClick={goPrev}>
             <ChevronLeft size={15} />
           </button>
-          <button className="pv-tool-btn" title="下一张 (→)" onClick={goNext}>
+          <button className="pv-tool-btn" title={t("img.next")} onClick={goNext}>
             <ChevronRight size={15} />
           </button>
         </div>
@@ -296,12 +302,10 @@ export function ImagePreviewPanel({
         <>
           <span>
             {imageKeys.length > 1
-              ? `第 ${index + 1} 张 / 共 ${imageKeys.length} 张`
-              : "1 张图片"}
+              ? t("img.counter", { i: index + 1, n: imageKeys.length })
+              : t("img.single")}
           </span>
-          <span className="pv-hint">
-            ← → 切换 · 滚轮缩放 · 拖动平移 · 0 适应 · 1 原始 · R 旋转 · ESC 关闭
-          </span>
+          <span className="pv-hint">{t("img.hint")}</span>
         </>
       }
     >
@@ -316,14 +320,14 @@ export function ImagePreviewPanel({
             className="nav-btn nav-prev"
             onClick={goPrev}
             disabled={loading}
-            title="上一张 (←)"
+            title={t("img.prev")}
           >
             <ChevronLeft size={22} />
           </button>
         )}
 
         <div className="img-canvas">
-          {loading && <div className="pv-state">加载中…</div>}
+          {loading && <div className="pv-state">{t("img.loading")}</div>}
           {error && <div className="pv-state error">{error}</div>}
           {url && !loading && !error && (
             <img
@@ -345,7 +349,7 @@ export function ImagePreviewPanel({
             className="nav-btn nav-next"
             onClick={goNext}
             disabled={loading}
-            title="下一张 (→)"
+            title={t("img.next")}
           >
             <ChevronRight size={22} />
           </button>
