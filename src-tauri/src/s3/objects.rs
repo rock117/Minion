@@ -4,6 +4,9 @@ use std::path::Path;
 use tauri::AppHandle;
 use tauri::Emitter;
 
+/// 预览内容的最大字节数（超过则不下载，提示用户用下载）
+const PREVIEW_MAX_BYTES: i64 = 2 * 1024 * 1024;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ObjectInfo {
     pub key: String,
@@ -11,6 +14,14 @@ pub struct ObjectInfo {
     pub last_modified: Option<String>,
     pub etag: Option<String>,
     pub is_dir: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ObjectContent {
+    pub key: String,
+    pub size: i64,
+    pub truncated: bool,
+    pub content: String,
 }
 
 /// 列出指定 bucket + 前缀下的对象（模拟"目录"概念）
@@ -175,4 +186,38 @@ pub async fn delete_object(client: &Client, bucket: &str, key: &str) -> anyhow::
         .send()
         .await?;
     Ok(())
+}
+
+/// 读取对象内容用于预览（带大小限制，超过 PREVIEW_MAX_BYTES 会截断）
+pub async fn get_object_content(
+    client: &Client,
+    bucket: &str,
+    key: &str,
+) -> anyhow::Result<ObjectContent> {
+    // 先 head 一下拿大小，避免下载超大文件
+    let head = client
+        .head_object()
+        .bucket(bucket)
+        .key(key)
+        .send()
+        .await?;
+    let size = head.content_length().unwrap_or(0);
+    if size > PREVIEW_MAX_BYTES {
+        return Ok(ObjectContent {
+            key: key.to_string(),
+            size,
+            truncated: true,
+            content: String::new(),
+        });
+    }
+
+    let resp = client.get_object().bucket(bucket).key(key).send().await?;
+    let bytes = resp.body.collect().await?.into_bytes();
+    let content = String::from_utf8_lossy(&bytes).to_string();
+    Ok(ObjectContent {
+        key: key.to_string(),
+        size,
+        truncated: false,
+        content,
+    })
 }

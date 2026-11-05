@@ -136,3 +136,15 @@ pub async fn delete_object(
     let client = s3::build_client(&conn).map_err(to_err)?;
     s3::delete_object(&client, &bucket, &key).await.map_err(to_err)
 }
+
+#[tauri::command]
+pub async fn get_object_content(
+    conn: Connection,
+    bucket: String,
+    key: String,
+) -> Result<s3::ObjectContent, String> {
+    let client = s3::build_client(&conn).map_err(to_err)?;
+    s3::get_object_content(&client, &bucket, &key)
+        .await
+        .map_err(to_err)
+}

@@ -9,6 +9,7 @@
 - 对象浏览（目录式导航、面包屑、上级目录）
 - 对象上传 / 下载（带进度事件）
 - 删除对象
+- 文本/JSON/XML 预览（树状结构 + 原始视图切换）
 
 ## 技术栈
 
@@ -101,6 +102,16 @@ npm run build    # 仅构建前端到 dist/
 
 - 对象行内点 **删除**，确认后即删除
 
+### 7. 预览文本/JSON/XML
+
+- 文本类对象（`.txt` `.json` `.xml` `.csv` `.md` `.yaml` `.log` 等约 30 种扩展名）行内会显示 **预览** 按钮
+- 点击后弹出预览面板：
+  - **JSON**：自动解析并展示为可折叠的树状结构，键/字符串/数字/布尔/空值分别着色
+  - **XML**：使用浏览器 DOMParser 解析为树状结构，标签名/属性/文本节点分别着色
+  - **其他文本**：直接显示原始内容
+- 顶部可切换 **树状** / **原始** 视图（纯文本类无此切换）
+- 预览大小上限 **2MB**，超过会提示用下载代替
+
 ## 配置存储位置
 
 连接配置通过 `tauri-plugin-store` 持久化，文件名 `minion-config.json`：
@@ -125,7 +136,7 @@ Minion/
 │       └── s3/
 │           ├── client.rs       # S3 client 构造
 │           ├── buckets.rs      # bucket 操作
-│           └── objects.rs      # 对象操作 + 进度事件
+│           └── objects.rs      # 对象操作 + 进度事件 + 内容预览
 └── src/
     ├── api.ts                  # invoke 封装 + 类型
     ├── store.ts                # zustand 状态管理
@@ -133,7 +144,11 @@ Minion/
     └── components/
         ├── ConnectionSidebar.tsx
         ├── BucketList.tsx
-        └── FileBrowser.tsx
+        ├── FileBrowser.tsx
+        ├── PreviewPanel.tsx    # 预览面板（文本/JSON/XML）
+        └── tree/
+            ├── JsonTree.tsx    # JSON 树状渲染
+            └── XmlTree.tsx     # XML 树状渲染
 ```
 
 ## 推荐 IDE

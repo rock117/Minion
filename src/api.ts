@@ -26,6 +26,13 @@ export interface ObjectInfo {
   is_dir: boolean;
 }
 
+export interface ObjectContent {
+  key: string;
+  size: number;
+  truncated: boolean;
+  content: string;
+}
+
 // ---------- 连接管理 ----------
 export const listConnections = () => invoke<Connection[]>("list_connections");
 
@@ -73,6 +80,9 @@ export const downloadFile = (
 
 export const deleteObject = (conn: Connection, bucket: string, key: string) =>
   invoke<void>("delete_object", { conn, bucket, key });
+
+export const getObjectContent = (conn: Connection, bucket: string, key: string) =>
+  invoke<ObjectContent>("get_object_content", { conn, bucket, key });
 
 // ---------- 工具 ----------
 export function formatSize(bytes: number): string {

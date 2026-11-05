@@ -8,6 +8,20 @@ import {
   uploadFile,
   type ObjectInfo,
 } from "../api";
+import { PreviewPanel } from "./PreviewPanel";
+
+// 可预览的扩展名（文本类）
+const PREVIEWABLE_EXT = [
+  ".txt", ".json", ".xml", ".csv", ".log", ".md", ".yaml", ".yml",
+  ".ini", ".conf", ".cfg", ".toml", ".html", ".htm", ".css", ".js",
+  ".ts", ".jsx", ".tsx", ".rs", ".go", ".py", ".java", ".c", ".cpp",
+  ".h", ".sh", ".bat", ".ps1", ".sql", ".env",
+];
+
+function isPreviewable(key: string): boolean {
+  const lower = key.toLowerCase();
+  return PREVIEWABLE_EXT.some((ext) => lower.endsWith(ext));
+}
 
 export function FileBrowser() {
   const {
@@ -22,6 +36,7 @@ export function FileBrowser() {
   } = useStore();
 
   const [busy, setBusy] = useState(false);
+  const [previewKey, setPreviewKey] = useState<string | null>(null);
 
   useEffect(() => {
     if (activeBucket) loadObjects();
@@ -150,6 +165,14 @@ export function FileBrowser() {
               <td>{obj.is_dir ? "-" : formatSize(obj.size)}</td>
               <td>{obj.last_modified ?? "-"}</td>
               <td className="row-actions">
+                {!obj.is_dir && isPreviewable(obj.key) && (
+                  <button
+                    onClick={() => setPreviewKey(obj.key)}
+                    disabled={busy}
+                  >
+                    预览
+                  </button>
+                )}
                 {!obj.is_dir && (
                   <button onClick={() => onDownload(obj)} disabled={busy}>
                     下载
@@ -174,6 +197,14 @@ export function FileBrowser() {
           )}
         </tbody>
       </table>
+
+      {previewKey && activeBucket && (
+        <PreviewPanel
+          bucket={activeBucket}
+          objKey={previewKey}
+          onClose={() => setPreviewKey(null)}
+        />
+      )}
     </div>
   );
 }
