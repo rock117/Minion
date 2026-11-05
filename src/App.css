@@ -416,18 +416,20 @@ body {
   white-space: nowrap;
 }
 
-/* 行内操作按钮默认隐藏，hover 才显示 */
+/* 行内操作按钮默认隐藏，仅 hover 或键盘聚焦时显示（选中态不显示） */
 .conn-row .icon-btn,
 .bucket-list li .icon-btn {
   opacity: 0;
+  pointer-events: none;
   transition: opacity 0.12s;
 }
 
 .conn-list li:hover .conn-row .icon-btn,
-.conn-list li.active .conn-row .icon-btn,
+.conn-list li:focus-within .conn-row .icon-btn,
 .bucket-list li:hover .icon-btn,
-.bucket-list li.active .icon-btn {
+.bucket-list li:focus-within .icon-btn {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .conn-endpoint {
@@ -691,11 +693,14 @@ body {
 
 .vtable-row .vcol-actions {
   opacity: 0;
+  pointer-events: none;
   transition: opacity 0.12s;
 }
 
-.vtable-row:hover .vcol-actions {
+.vtable-row:hover .vcol-actions,
+.vtable-row:focus-within .vcol-actions {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .vtable-loading,
@@ -1323,13 +1328,16 @@ button.danger:hover:not(:disabled) {
   border: none;
   color: var(--text-dim);
   opacity: 0;
+  pointer-events: none;
   margin-left: 6px;
   border-radius: 4px;
   flex-shrink: 0;
 }
 
-.tree-row:hover .tree-copy {
+.tree-row:hover .tree-copy,
+.tree-row:focus-within .tree-copy {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .tree-copy:hover:not(:disabled) {
@@ -1470,8 +1478,10 @@ button.danger:hover:not(:disabled) {
   opacity: 0;
 }
 
-.search-result:hover .tree-copy {
+.search-result:hover .tree-copy,
+.search-result:focus-within .tree-copy {
   opacity: 1;
+  pointer-events: auto;
 }
 
 /* ============================================================

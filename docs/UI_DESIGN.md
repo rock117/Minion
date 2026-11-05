@@ -167,7 +167,7 @@
 
 - 列表项圆角 `--r-md`，hover 背景 `--panel-hover`。
 - 当前选中项：背景 `--accent-soft`，左侧 3px 竖条（`::before`）用 `--accent`。
-- 行内操作按钮（编辑/删除）**默认隐藏**，hover 或选中时淡入（`opacity` 过渡 0.12s）。
+- 行内操作按钮（编辑/删除）**默认隐藏**，仅 hover 或键盘聚焦（`:focus-within`）时淡入；**选中态不显示**（避免常驻干扰）。
 - 空状态：居中、`--text-dim`、字号 12.5–13px，文案要说明「为什么空 + 怎么操作」。
 
 ### 4.4 表格（虚拟滚动）
@@ -176,7 +176,7 @@
 - 行高固定 36px，hover 背景 `--panel-2`。
 - 列：名称（`1fr`）/ 大小（84px）/ 修改时间（148px）/ 操作（116px）。
 - 数字列使用 `font-variant-numeric: tabular-nums`。
-- 行内操作图标按钮默认 `opacity: 0`，行 hover 时显示。
+- 行内操作图标按钮默认 `opacity: 0` + `pointer-events: none`，仅行 hover 或 `:focus-within` 时显示。
 - 文件夹图标 `--accent-hover`，文件图标 `--text-dim`。
 - 文件夹名称后可显示文件数徽标 `.folder-count`：按需统计、结果缓存、并发受限，单目录上限 1000，超出显示 `N+`；可在设置中关闭。
 
