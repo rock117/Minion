@@ -196,7 +196,16 @@ Minion/
 npm run tauri -- icon src-tauri/icon-source.png
 ```
 
-生成的图标位于 `src-tauri/icons/`（`32x32.png`、`128x128.png`、`icon.ico`、`icon.icns` 等）。生成后若标题栏图标未更新，执行 `cd src-tauri && cargo clean -p minion` 再重新构建。
+生成的图标位于 `src-tauri/icons/`（`32x32.png`、`128x128.png`、`icon.ico`、`icon.icns` 等）。
+
+- `src-tauri/build.rs` 已监听 `icons` 目录，图标变化后重新构建会自动重新嵌入，无需手动 `cargo clean`。
+- NSIS 安装包图标通过 `tauri.conf.json` 的 `bundle.windows.nsis.installerIcon` 指定为 `icons/icon.ico`。
+- 若**安装后**桌面/开始菜单仍显示旧图标，通常是 Windows 图标缓存所致：先卸载旧版本，再清理图标缓存后重装。清理命令：
+
+  ```powershell
+  ie4uinit.exe -show
+  # 或重启 explorer.exe
+  ```
 
 ## 开发规范
 
