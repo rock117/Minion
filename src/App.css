@@ -108,31 +108,6 @@ body {
   user-select: none;
 }
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.brand-logo {
-  width: 24px;
-  height: 24px;
-  border-radius: var(--r-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  background: linear-gradient(135deg, var(--accent), #a855f7);
-  box-shadow: 0 2px 8px var(--accent-glow);
-}
-
-.brand-name {
-  font-size: 13.5px;
-  font-weight: 650;
-  letter-spacing: -0.01em;
-  color: var(--text);
-}
-
 .header-meta {
   display: flex;
   align-items: center;

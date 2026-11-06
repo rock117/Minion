@@ -188,6 +188,16 @@ Minion/
             └── XmlTree.tsx     # XML 树状渲染
 ```
 
+## 应用图标
+
+图标源文件为 `src-tauri/icon-source.png`（1024×1024）。修改后重新生成各平台图标：
+
+```bash
+npm run tauri -- icon src-tauri/icon-source.png
+```
+
+生成的图标位于 `src-tauri/icons/`（`32x32.png`、`128x128.png`、`icon.ico`、`icon.icns` 等）。生成后若标题栏图标未更新，执行 `cd src-tauri && cargo clean -p minion` 再重新构建。
+
 ## 开发规范
 
 - **[`docs/UI_DESIGN.md`](docs/UI_DESIGN.md)**：UI 设计规范（设计令牌、组件规范、交互状态、反模式、变更检查清单）

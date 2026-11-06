@@ -6,7 +6,7 @@ import { FileBrowser } from "./components/FileBrowser";
 import { SettingsDialog } from "./components/SettingsDialog";
 import { DialogProvider } from "./dialogs";
 import { useT } from "./i18n";
-import { Boxes, Settings } from "lucide-react";
+import { Settings } from "lucide-react";
 import "./App.css";
 
 function App() {
@@ -25,12 +25,6 @@ function App() {
     <DialogProvider>
       <div className="app">
         <header className="app-header">
-          <div className="brand">
-            <span className="brand-logo">
-              <Boxes size={16} strokeWidth={2.2} />
-            </span>
-            <span className="brand-name">Minion</span>
-          </div>
           <div className="header-meta">
             {activeConn ? (
               <>
@@ -46,14 +40,14 @@ function App() {
                 </span>
               </>
             )}
-            <button
-              className="icon-btn header-settings"
-              title={t("settings.open")}
-              onClick={() => setShowSettings(true)}
-            >
-              <Settings size={16} />
-            </button>
           </div>
+          <button
+            className="icon-btn header-settings"
+            title={t("settings.open")}
+            onClick={() => setShowSettings(true)}
+          >
+            <Settings size={16} />
+          </button>
         </header>
 
         <div className="app-body">
