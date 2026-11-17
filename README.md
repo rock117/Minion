@@ -63,6 +63,33 @@ npm run build    # 仅构建前端到 dist/
 
 > 注意：仅前端模式下无法调用 Tauri commands（连接 MinIO 等功能不可用），仅适合调样式。
 
+## 发布到 GitHub（自动生成安装包）
+
+流水线：[`.github/workflows/release.yml`](.github/workflows/release.yml)。
+
+- **每次 push**（任意分支）都会在 Windows / macOS（Apple Silicon + Intel）/ Linux 上并行构建安装包，产物在该次 Actions 运行页的 **Artifacts** 区域下载（保留 14 天，下载需登录 GitHub；同一分支的新 push 会取消未完成的旧构建）。
+- **推 tag**（或手动指定 tag）才会额外创建 Release，提供公开下载链接。
+- 若只想在 `main` 上构建，把 `on.push.branches` 里的 `"**"` 改成 `main` 即可。
+
+```bash
+# 1. 同步版本号到 package.json / package-lock.json / tauri.conf.json / Cargo.toml
+node scripts/set-version.mjs 0.2.0
+git commit -am "chore: bump version to 0.2.0"
+
+# 2. 打 tag 并推送（tag 即发布版本）
+git tag v0.2.0
+git push origin main --tags
+```
+
+- 前提：仓库已推送到 GitHub 且已启用 Actions（私有仓库注意 macOS runner 的分钟数按 10 倍计费）。
+- **tag 必须与版本号一致**：流水线会校验 `package.json`、`src-tauri/tauri.conf.json`、`src-tauri/Cargo.toml` 三处版本号是否等于 tag（去掉 `v`），不一致会在构建前失败并给出修复命令，避免「Release 写着 v0.2.0、安装包却是 0.1.0」。
+- 也可以在 Actions 页面手动触发 `Build & Release` 工作流：不填 tag 只构建安装包，填了 tag 则同时发布 Release。
+- 产物：Windows `minion_<ver>_x64-setup.exe` / `.msi`，macOS `minion_<ver>_aarch64.dmg` / `_x64.dmg`，Linux `.AppImage` / `.deb` / `.rpm`；Release 额外附 `SHA256SUMS.txt`。
+- 未配置代码签名时的安装提示：Windows 选「更多信息 → 仍要运行」；macOS 首次打开需在 Finder 中右键 → 打开（或 `xattr -dr com.apple.quarantine /Applications/minion.app`）。
+- 若 Release 创建时报权限错误，到仓库 `Settings → Actions → General → Workflow permissions` 选择 **Read and write**。
+
+> 当前未做代码签名与 notarize，正式对外分发前建议配置：Windows 证书（`TAURI_SIGNING_PRIVATE_KEY` 等 updater 密钥另算）、macOS `APPLE_CERTIFICATE` / `APPLE_ID` / `APPLE_TEAM_ID` secrets。
+
 ## 如何使用
 
 ### 1. 添加 MinIO 连接
